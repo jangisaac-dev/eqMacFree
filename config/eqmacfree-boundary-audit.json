@@ -1,0 +1,89 @@
+{
+  "targets": [
+    "README.md",
+    "package.json",
+    "CONTRIBUTING.md",
+    "docs/roadmap/*.md",
+    ".github/ISSUE_TEMPLATE/*.md",
+    "ui/src/**/*.ts",
+    "ui/src/**/*.html",
+    "ui/angular.json",
+    "native/app/Source/Constants.swift",
+    "native/app/Supporting Files/Info.plist",
+    "native/driver/Supporting Files/Info.plist",
+    "native/app/eqMac.xcodeproj/xcshareddata/xcschemes/*.xcscheme",
+    "native/driver/Driver.xcodeproj/xcshareddata/xcschemes/*.xcscheme"
+  ],
+  "forbiddenPatterns": [
+    {
+      "id": "legacy-eqmac-domain",
+      "severity": "hard",
+      "why": "Legacy production domains must not remain in the public continuation so contributors do not keep shipping the old brand surface.",
+      "expectedFix": "Replace the legacy hostnames with eqMacFree-owned launch-surface values or remove the stale reference entirely.",
+      "patterns": ["eqmac.app", "update.eqmac.app", "ui-v3.eqmac.app"]
+    },
+    {
+      "id": "legacy-github-repo",
+      "severity": "hard",
+      "why": "The public repo must point to the eqMacFree origin so launch artifacts and contributor guidance stay aligned.",
+      "expectedFix": "Swap the old owner/repo reference for the eqMacFree repository path everywhere it appears.",
+      "patterns": ["bitgapp/eqMac"]
+    },
+    {
+      "id": "legacy-bundle-ids",
+      "severity": "hard",
+      "why": "Bundle identifiers must be unique to the public continuation so signing, updates, and installed apps do not collide with the old product.",
+      "expectedFix": "Rename the stale bundle identifiers to the eqMacFree identifiers used by the current app targets.",
+      "patterns": ["com.bitgapp.eqmac", "com.bitgapp.eqmac.driver"]
+    }
+  ],
+  "restrictedWording": [
+    {
+      "id": "legacy-paid-language",
+      "severity": "hard",
+      "why": "Contributor-facing copy should not imply private paid tiers in public surfaces unless a documented exception applies.",
+      "expectedFix": "Remove the paid-tier wording or move it only into the explicitly allowed contributor documentation surfaces.",
+      "patterns": ["Pro", "Premium", "Upgrade", "promotion"],
+      "allowedIn": [
+        "README.md",
+        "docs/superpowers/specs/*.md",
+        "docs/superpowers/plans/*.md",
+        "docs/guardrails/*.md"
+      ]
+    }
+  ],
+  "alignmentChecks": [
+    {
+      "id": "readme-feature-buckets",
+      "severity": "warning",
+      "file": "README.md",
+      "why": "The README should keep the public launch inventory visible so contributors can see what is available now versus deferred work.",
+      "expectedFix": "Keep the three feature buckets present and update their wording if the public inventory changes.",
+      "requiredSnippets": ["### Available now", "### Lock candidates", "### Missing reimplementation"]
+    },
+    {
+      "id": "roadmap-reimplementation-language",
+      "severity": "warning",
+      "file": "docs/roadmap/lock-feature-backlog.md",
+      "why": "The roadmap note should preserve the reimplementation framing so the public backlog is not mistaken for hidden unlock work.",
+      "expectedFix": "Keep the reimplementation wording and the explicit note that this list is not a hidden unlock checklist.",
+      "requiredSnippets": ["reimplementation", "not a checklist for unlocking hidden code"]
+    },
+    {
+      "id": "ui-public-routing-surface",
+      "severity": "warning",
+      "file": "ui/src/app/services/constants.service.ts",
+      "why": "The UI launch surface should keep support and update routing pointed at public GitHub destinations instead of drifting toward legacy hosted product endpoints.",
+      "expectedFix": "Keep the repo-backed routing constants for README, releases, and issue chooser aligned with the eqMacFree GitHub repository.",
+      "requiredSnippets": ["readonly DOMAIN = 'github.com'", "readonly REPO_URL = new URL(`https://${this.DOMAIN}/${this.GITHUB_OWNER}/${this.REPO_NAME}`)", "readonly ROADMAP_URL = new URL(`${this.REPO_URL.toString()}/blob/main/docs/roadmap/lock-feature-backlog.md`)", "readonly BUG_REPORT_URL = new URL(`${this.REPO_URL.toString()}/issues/new/choose`)"]
+    },
+    {
+      "id": "native-public-routing-surface",
+      "severity": "warning",
+      "file": "native/app/Source/Constants.swift",
+      "why": "The native launch constants should keep support, bug reporting, trusted URLs, and update behavior aligned with public GitHub routing or intentionally neutralized endpoints.",
+      "expectedFix": "Keep the native constants anchored to the eqMacFree GitHub repo, issue chooser, GitHub trusted domains, and nil update feeds for the current launch model.",
+      "requiredSnippets": ["static let REPO_URL = URL(string: \"https://github.com/\\(Constants.REPO_OWNER)/\\(Constants.REPO_NAME)\")!", "static let NEW_ISSUE_URL = URL(string: \"https://github.com/\\(Constants.REPO_OWNER)/\\(Constants.REPO_NAME)/issues/new/choose\")!", "static let UPDATES_FEED: URL? = nil", "static let BETA_UPDATES_FEED: URL? = nil", "static let OPEN_URL_TRUSTED_DOMAINS: [String] = [\"github.com\"]"]
+    }
+  ]
+}

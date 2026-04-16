@@ -14,7 +14,8 @@
     "nohoist": []
   },
   "scripts": {
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "audit:boundary": "node scripts/audit/run-boundary-audit.mjs"
   },
   "repository": {
     "type": "git",
