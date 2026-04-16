@@ -5,7 +5,7 @@ import { ColorsService } from '../../services/colors.service'
   selector: 'eqm-pro',
   template: `
     <div [ngStyle]="style">
-      <eqm-label [fontSize]="fontSize" [color]="color">Pro</eqm-label>
+      <eqm-label [fontSize]="fontSize" [color]="color">Lock</eqm-label>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
