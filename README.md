@@ -42,6 +42,12 @@ Detailed tracking lives in:
 - Use GitHub Discussions or pull requests for collaboration once the public repo is live.
 - eqMacFree should be understood as an independent continuation of the public snapshot, not the private eqMac Pro line.
 
+## Guardrails
+
+- Locked historical capabilities should point users to roadmap/issues tracking rather than upgrade or purchase flows.
+- Run `yarn audit:boundary` before merging launch-surface changes.
+- See [`docs/guardrails/feature-capability-audit.md`](docs/guardrails/feature-capability-audit.md) for the release checklist and audit rule intent.
+
 ## Technology
 
 eqMacFree currently retains the public snapshot architecture:

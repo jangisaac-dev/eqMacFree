@@ -4,6 +4,8 @@ eqMacFree accepts focused pull requests against the public repository. Please st
 
 For larger changes, describe the intended scope before implementation so launch-critical work and future lock-feature reimplementation work do not drift together.
 
+If your change touches README, roadmap docs, user-facing UI copy, native launch identity, or support/update routing, run `yarn audit:boundary` before merging.
+
 ## Development
 Fork the repository, then run these commands in Terminal.app:
 
