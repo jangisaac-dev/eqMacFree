@@ -1,7 +1,7 @@
 {
-  "name": "eqmac",
+  "name": "eqmac-free",
   "version": "1.0.0",
-  "description": "eqMac Monorepo",
+  "description": "eqMacFree monorepo",
   "main": ".eslintrc.js",
   "private": true,
   "workspaces": {
@@ -18,14 +18,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitgapp/eqMac.git"
+    "url": "git+https://github.com/jangisaac-dev/eqMacFree.git"
   },
   "author": "Roman Kisil <Nodeful>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bitgapp/eqMac/issues"
+    "url": "https://github.com/jangisaac-dev/eqMacFree/issues"
   },
-  "homepage": "https://github.com/bitgapp/eqMac#readme",
+  "homepage": "https://github.com/jangisaac-dev/eqMacFree#readme",
   "devDependencies": {
     "@angular-devkit/core": "^12.2.7",
     "@angular/animations": "~12.2.7",
