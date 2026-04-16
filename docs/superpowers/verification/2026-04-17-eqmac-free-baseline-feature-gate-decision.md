@@ -4,7 +4,7 @@
 
 ## Decision
 
-- Current decision: `Pending`
+- Current decision: `Blocked`
 
 ## Gate rule
 
@@ -20,4 +20,4 @@
 
 ## Next action
 
-- Run the app through the bootstrap script and execute the feature checklist.
+- Baseline gate failed. Resolve the items listed in `2026-04-17-eqmac-free-baseline-feature-issues.md` before starting `Spatial Audio` implementation.
