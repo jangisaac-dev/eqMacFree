@@ -5,12 +5,13 @@ import { ColorsService } from '../../services/colors.service'
   selector: 'eqm-pro',
   template: `
     <div [ngStyle]="style">
-      <eqm-label [fontSize]="fontSize" [color]="color">Lock</eqm-label>
+      <eqm-label [fontSize]="fontSize" [color]="color">{{text}}</eqm-label>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProComponent {
+  @Input() text = 'Lock'
   @Input() color = this.colors.light
   @Input() backgroundColor = this.colors.dark
   @Input() fontSize = 14

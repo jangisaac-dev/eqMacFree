@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
 import { Options } from 'src/app/components/options/options.component'
 import { ApplicationService, Info } from 'src/app/services/app.service'
 import { ConstantsService } from 'src/app/services/constants.service'
+import { LockStateDialogComponent } from 'src/app/components/lock-state-dialog/lock-state-dialog.component'
+import { LockStateService } from 'src/app/services/lock-state.service'
 import packageJson from '../../../../package.json'
 import { UIService } from '../../services/ui.service'
 
@@ -19,6 +22,10 @@ export class HelpComponent implements OnInit {
         action: this.faq.bind(this)
       }, {
         type: 'button',
+        label: 'Volume Mixer',
+        action: this.openVolumeMixerLock.bind(this)
+      }, {
+        type: 'button',
         label: 'Report a Bug',
         action: this.reportBug.bind(this)
       }
@@ -28,7 +35,9 @@ export class HelpComponent implements OnInit {
   constructor (
     public app: ApplicationService,
     public CONST: ConstantsService,
-    public ui: UIService
+    public ui: UIService,
+    public dialog: MatDialog,
+    public lockState: LockStateService
   ) {}
 
   uiVersion = `${packageJson.version} (${this.ui.isLocal ? 'Local' : 'Remote'})`
@@ -47,5 +56,18 @@ export class HelpComponent implements OnInit {
 
   faq () {
     this.app.openURL(this.CONST.FAQ_URL)
+  }
+
+  openVolumeMixerLock () {
+    const definition = this.lockState.getDefinition('volume-mixer')
+
+    this.dialog.open(LockStateDialogComponent, {
+      data: {
+        title: `${definition.title} · ${definition.label}`,
+        description: definition.description,
+        roadmapUrl: definition.roadmapUrl,
+        issueUrl: definition.issueUrl
+      }
+    })
   }
 }
