@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "eqmac": {
+    "eqmac-free": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -72,18 +72,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "eqmac:build"
+              "browserTarget": "eqmac-free:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "eqmac:build:production"
+              "browserTarget": "eqmac-free:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "eqmac:build"
+            "browserTarget": "eqmac-free:build"
           }
         },
         "lint": {
@@ -101,5 +101,5 @@
       }
     }
   },
-  "defaultProject": "eqmac"
+  "defaultProject": "eqmac-free"
 }

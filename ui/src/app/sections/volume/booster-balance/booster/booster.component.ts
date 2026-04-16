@@ -62,7 +62,7 @@ export class BoosterComponent implements OnInit, OnDestroy {
   }
 
   public ignoreUpdates = false
-  public ignoreUpdatesDebouncer: NodeJS.Timer
+  public ignoreUpdatesDebouncer: ReturnType<typeof setTimeout>
 
   private onGainChangedEventCallback: BoosterGainChangedEventCallback
   private onBoostEnabledChangedEventCallback: BoostEnabledChangedEventCallback

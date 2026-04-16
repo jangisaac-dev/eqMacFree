@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "target": "es5",
+    "types": [],
     "typeRoots": [
       "node_modules/@types",
       "../node_modules/@types"
