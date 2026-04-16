@@ -13,7 +13,6 @@ import EmitterKit
 import SwiftyUserDefaults
 import WebKit
 import Zip
-import SwiftHTTP
 import Shared
 
 enum UIMode: String, Codable {
@@ -438,9 +437,19 @@ class UI: StoreSubscriber {
 
   }
   
+  private static func fetchRemoteData(from url: URL, completion: @escaping (Data?, Error?) -> Void) {
+    URLSession.shared.dataTask(with: url) { data, _, error in
+      completion(data, error)
+    }.resume()
+  }
+
   private static func getRemoteVersion (_ completion: @escaping (String?) -> Void) {
-    HTTP.GET("\(Constants.UI_ENDPOINT_URL)/version.txt") { resp in
-      completion(resp.error != nil ? nil : resp.text?.trim())
+    let versionURL = Constants.UI_ENDPOINT_URL.appendingPathComponent("version.txt")
+    fetchRemoteData(from: versionURL) { data, error in
+      guard error == nil, let data = data, let text = String(data: data, encoding: .utf8) else {
+        return completion(nil)
+      }
+      completion(text.trim())
     }
   }
   
@@ -452,9 +461,9 @@ class UI: StoreSubscriber {
         return completion(false)
       }
 
-      HTTP.GET(Constants.UI_ENDPOINT_URL.absoluteString) { response in
+      fetchRemoteData(from: Constants.UI_ENDPOINT_URL) { _, error in
         returned = true
-        completion(response.error == nil)
+        completion(error == nil)
       }
     }
     
@@ -469,15 +478,14 @@ class UI: StoreSubscriber {
   private static func cacheRemote () {
     // Only download ui.zip when UI endpoint is remote
     if Constants.REMOTE_SERVICES_ENABLED && Constants.UI_ENDPOINT_URL.absoluteString.contains(Constants.DOMAIN) {
-      let remoteZipUrl = "\(Constants.UI_ENDPOINT_URL)/ui.zip"
-      Console.log("Caching Remote UI from \(remoteZipUrl)")
-      let download = HTTP(URLRequest(urlString: remoteZipUrl)!)
-      
-      download.run() { resp in
+      let remoteZipURL = Constants.UI_ENDPOINT_URL.appendingPathComponent("ui.zip")
+      Console.log("Caching Remote UI from \(remoteZipURL.absoluteString)")
+
+      fetchRemoteData(from: remoteZipURL) { data, error in
         Console.log("Finished caching Remote UI")
-        if resp.error == nil {
+        if error == nil, let data = data {
           do {
-            try resp.data.write(to: remoteZipPath, options: .atomic)
+            try data.write(to: remoteZipPath, options: .atomic)
           } catch {
             print(error)
           }

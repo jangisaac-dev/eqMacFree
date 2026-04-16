@@ -4,7 +4,7 @@
 
 ## Decision
 
-- Current decision: `Blocked`
+- Current decision: `Pending`
 
 ## Gate rule
 
@@ -20,4 +20,4 @@
 
 ## Next action
 
-- Baseline gate failed. Resolve the items listed in `2026-04-17-eqmac-free-baseline-feature-issues.md` before starting `Spatial Audio` implementation.
+- App launch is now restored. Continue feature-by-feature baseline verification before starting `Spatial Audio` implementation.

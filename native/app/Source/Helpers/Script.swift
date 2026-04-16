@@ -14,18 +14,19 @@ class Script {
     let resourcePath = Bundle(for: self).resourcePath
     let scriptAbsolutePath = resourcePath! + "/" + name + ".sh"
     let task: STPrivilegedTask = STPrivilegedTask()
-    task.launchPath = "/bin/sh"
-    task.arguments = [scriptAbsolutePath]
-    
-    task.terminationHandler = { _ in
-      finished(task.terminationStatus == 0)
-    }
+    task.setLaunchPath("/bin/sh")
+    task.setArguments([scriptAbsolutePath])
+
     let err: OSStatus = task.launch()
     
     if (err != errAuthorizationSuccess) {
       return finished(false)
     } else {
       started?()
+      DispatchQueue.global(qos: .utility).async {
+        task.waitUntilExit()
+        finished(task.terminationStatus() == 0)
+      }
     }
     
   }
