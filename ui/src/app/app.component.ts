@@ -144,15 +144,15 @@ export class AppComponent implements OnInit, AfterContentInit {
 
       const doCollectTelemetryOption: Option = {
         type: 'checkbox',
-        label: 'Send Anonymous Analytics data',
+        label: 'Send anonymous usage telemetry',
         tooltip: `
-eqMac would collect anonymous Telemetry analytics data like:
+eqMacFree can collect anonymous usage data such as:
 
-• macOS Version
-• App and UI Version
-• Country (IP Addresses are anonymized)
+• macOS version
+• app and UI version
+• country derived from anonymized IP data
 
-This helps us understand distribution of our users.
+This helps maintainers understand how the public app is used.
 `,
         tooltipAsComponent: true,
         value: doCollectTelemetry,
@@ -164,12 +164,12 @@ This helps us understand distribution of our users.
 
       const doCollectCrashReportsOption: Option = {
         type: 'checkbox',
-        label: 'Send Anonymous Crash reports',
+        label: 'Send anonymous crash reports',
         tooltip: `
-eqMac would send anonymized crash reports
-back to the developer in case eqMac crashes.
-This helps us understand improve eqMac 
-and make it a more stable product.
+eqMacFree can send anonymized crash reports
+to the maintainers if the app crashes.
+This helps us diagnose stability problems
+and improve the public release.
 `,
         tooltipAsComponent: true,
         value: doCollectCrashReports,
@@ -185,9 +185,9 @@ and make it a more stable product.
           options: [
             [ { type: 'label', label: 'Privacy' } ],
             [ {
-              type: 'label', label: `eqMac respects its user's privacy 
-and is giving you a choice what data you wish to share with the developer.
-This data would help us improve and grow the product.`
+              type: 'label', label: `eqMacFree respects your privacy
+and lets you choose what anonymous data to share with the maintainers.
+That data helps improve reliability and prioritize public roadmap work.`
             } ],
             [ doCollectTelemetryOption ],
             [ doCollectCrashReportsOption ],

@@ -60,15 +60,15 @@ export class SettingsComponent implements OnInit {
 
   doCollectTelemetryOption: CheckboxOption = {
     type: 'checkbox',
-    label: 'Send Analytics telemetry',
+    label: 'Send anonymous usage telemetry',
     tooltip: `
-eqMac would collect anonymous Telemetry analytics data like:
+eqMacFree can collect anonymous usage data such as:
 
-• macOS Version
-• App and UI Version
-• Country (IP Addresses are anonymized)
+• macOS version
+• app and UI version
+• country derived from anonymized IP data
 
-This helps us understand distribution of our users.
+This helps maintainers understand how the public app is used.
 `,
     value: false,
     toggled: doCollectTelemetry => {
@@ -83,12 +83,12 @@ This helps us understand distribution of our users.
 
   doCollectCrashReportsOption: CheckboxOption = {
     type: 'checkbox',
-    label: 'Send Crash reports',
+    label: 'Send anonymous crash reports',
     tooltip: `
-eqMac would send anonymized crash reports
-back to the developer in case eqMac crashes.
-This helps us understand improve eqMac 
-and make it a more stable product.
+eqMacFree can send anonymized crash reports
+to the maintainers if the app crashes.
+This helps us diagnose stability problems
+and improve the public release.
 `,
     value: false,
     toggled: doCollectCrashReports => {
@@ -126,7 +126,7 @@ and make it a more stable product.
 
   uninstallOption: ButtonOption = {
     type: 'button',
-    label: 'Uninstall eqMac',
+    label: 'Open uninstall guide',
     hoverable: false,
     action: this.uninstall.bind(this)
   }
@@ -151,12 +151,11 @@ and make it a more stable product.
   otaUpdatesOption: CheckboxOption = {
     type: 'checkbox',
     value: false,
-    label: 'OTA Updates',
+    label: 'UI content updates',
     tooltip: `
-Because eqMac's User Interface is built with Web Technologies 
-the developer can periodically push Over the Air (OTA) updates,
-make minor bug fixes and UI improvements,
-all without needing the user to do a full app update.
+Because the eqMacFree interface is built with web technologies,
+maintainers can ship small UI-only updates separately from full desktop releases.
+Use this only if you want the latest published interface content.
 `,
     tooltipAsComponent: false,
     toggled: doOTAUpdates => {
@@ -169,11 +168,10 @@ all without needing the user to do a full app update.
   betaUpdatesOption: CheckboxOption = {
     type: 'checkbox',
     value: false,
-    label: 'Beta Program',
+    label: 'Preview updates',
     tooltip: `
-Get and test the most latest changes to eqMac.
-Help the developer identify and fix uncaught issues, 
-before they go out to all users.
+Get preview builds of recent eqMacFree changes.
+This helps maintainers catch issues before broader public rollout.
 `,
     toggled: doBetaUpdates => {
       this.settingsService.setDoBetaUpdates({
