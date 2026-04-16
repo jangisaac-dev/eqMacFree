@@ -66,7 +66,7 @@ export class HeaderComponent implements OnInit {
       data: {
         confirmText: 'Yes, quit',
         cancelText: 'No, cancel',
-        text: 'Are you sure you want to quit eqMac?'
+        text: 'Are you sure you want to quit eqMacFree?'
       }
     })
 
