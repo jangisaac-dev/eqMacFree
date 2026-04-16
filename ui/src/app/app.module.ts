@@ -72,6 +72,7 @@ import { MatDialogConfig, MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@a
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component'
 import { EqualizerPresetsComponent } from './sections/effects/equalizers/presets/equalizer-presets.component'
 import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.component'
+import { LockStateDialogComponent } from './components/lock-state-dialog/lock-state-dialog.component'
 import { OptionsDialogComponent } from './components/options-dialog/options-dialog.component'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { UIService } from './services/ui.service'
@@ -90,6 +91,7 @@ import { UIService } from './services/ui.service'
   entryComponents: [
     ConfirmDialogComponent,
     PromptDialogComponent,
+    LockStateDialogComponent,
     OptionsDialogComponent
   ],
   declarations: [
@@ -113,6 +115,7 @@ import { UIService } from './services/ui.service'
     ConfirmDialogComponent,
     EqualizerPresetsComponent,
     PromptDialogComponent,
+    LockStateDialogComponent,
     OptionsDialogComponent
   ],
   providers: [

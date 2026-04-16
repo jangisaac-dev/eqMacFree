@@ -1,0 +1,19 @@
+<div fxLayout="column" fxLayoutGap="10px">
+  <eqm-label style="white-space: pre-line;">
+    {{data.title}}
+  </eqm-label>
+
+  <eqm-label style="white-space: pre-line;">
+    {{data.description}}
+  </eqm-label>
+
+  <div fxLayout="row" fxLayoutGap="10px">
+    <eqm-button type="narrow" fxFlex (pressed)="openRoadmap()">
+      <eqm-label [clickable]="true">View roadmap</eqm-label>
+    </eqm-button>
+
+    <eqm-button type="narrow" fxFlex (pressed)="openIssueTracker()">
+      <eqm-label [clickable]="true">Request feature</eqm-label>
+    </eqm-button>
+  </div>
+</div>
