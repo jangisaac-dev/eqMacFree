@@ -1,0 +1,670 @@
+# eqMacFree Baseline Feature Verification Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Build a repeatable macOS app run loop, verify the six `Available now` features in the real app, and produce the gate decision that controls whether former Pro feature work may start.
+
+**Architecture:** Treat this as a validation-and-evidence pass, not feature development. First create one stable Xcode-based build/run entrypoint for `eqMacFree`, then record verification evidence in dedicated Markdown artifacts, and only then make the pass/partial/fail gate decision that decides whether `Spatial Audio` work can begin.
+
+**Tech Stack:** Xcode workspace build/run, macOS shell scripts, Codex environment config, Angular UI surfaces, Swift native audio pipeline, Markdown verification artifacts.
+
+---
+
+## File structure map
+
+- Create: `script/build_and_run.sh`
+  - Single project-local macOS kill/build/run entrypoint for `eqMacFree`.
+- Create: `.codex/environments/environment.toml`
+  - Codex app `Run` action wired to `./script/build_and_run.sh`.
+- Create: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md`
+  - Feature-by-feature verification checklist with status and evidence.
+- Create: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+  - Running issue log for launch blockers and partial/fail findings.
+- Create: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md`
+  - Final pass/partial/fail gate decision and next-step recommendation.
+- Reference: `native/eqMac.xcworkspace`
+  - Primary macOS workspace for the app and driver.
+- Reference: `native/app/eqMac.xcodeproj/xcshareddata/xcschemes/eqMac.xcscheme`
+  - Confirms the runnable app product is `eqMacFree.app` under the `eqMac` scheme.
+- Reference: `README.md`
+  - Source of truth for the six `Available now` features.
+- Reference: `ui/src/app/sections/outputs/outputs.component.ts`
+  - Output selection UI anchor used for system-audio and HDMI validation.
+- Reference: `ui/src/app/sections/volume/booster-balance/booster/booster.component.ts`
+  - Volume-booster UI anchor.
+- Reference: `ui/src/app/sections/volume/booster-balance/balance/balance.component.ts`
+  - Balance UI anchor.
+- Reference: `ui/src/app/sections/effects/equalizers/basic-equalizer/basic-equalizer.component.ts`
+  - Basic EQ UI anchor.
+- Reference: `ui/src/app/sections/effects/equalizers/advanced-equalizer/advanced-equalizer.component.ts`
+  - Advanced EQ UI anchor.
+- Reference: `native/app/Source/Application.swift`
+  - App startup and audio-pipeline lifecycle anchor.
+- Reference: `native/app/Source/Audio/Outputs/Outputs.swift`
+  - Native output selection behavior.
+- Reference: `native/app/Source/Audio/Volume/Volume.swift`
+  - Native master-volume and balance behavior.
+- Reference: `native/app/Source/Audio/Effects/Equalizers/Equalizers.swift`
+  - Equalizer switching anchor.
+
+---
+
+### Task 1: Bootstrap a repeatable macOS build/run loop
+
+**Files:**
+- Create: `script/build_and_run.sh`
+- Create: `.codex/environments/environment.toml`
+- Reference: `native/eqMac.xcworkspace`
+- Reference: `native/app/eqMac.xcodeproj/xcshareddata/xcschemes/eqMac.xcscheme`
+
+- [ ] **Step 1: Create the run script**
+
+Write `script/build_and_run.sh` with this content:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODE="${1:-run}"
+APP_NAME="eqMacFree"
+WORKSPACE="native/eqMac.xcworkspace"
+SCHEME="eqMac"
+CONFIGURATION="Debug"
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DERIVED_DATA="$ROOT_DIR/build"
+APP_BUNDLE="$DERIVED_DATA/Build/Products/$CONFIGURATION/$APP_NAME.app"
+APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+
+pkill -x "$APP_NAME" >/dev/null 2>&1 || true
+
+xcodebuild \
+  -workspace "$WORKSPACE" \
+  -scheme "$SCHEME" \
+  -configuration "$CONFIGURATION" \
+  -derivedDataPath "$DERIVED_DATA" \
+  build
+
+open_app() {
+  /usr/bin/open -n "$APP_BUNDLE"
+}
+
+case "$MODE" in
+  run)
+    open_app
+    ;;
+  --debug|debug)
+    lldb -- "$APP_BINARY"
+    ;;
+  --logs|logs)
+    open_app
+    /usr/bin/log stream --info --style compact --predicate "process == \"$APP_NAME\""
+    ;;
+  --telemetry|telemetry)
+    open_app
+    /usr/bin/log stream --info --style compact --predicate "process == \"$APP_NAME\""
+    ;;
+  --verify|verify)
+    open_app
+    sleep 2
+    pgrep -x "$APP_NAME" >/dev/null
+    ;;
+  *)
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify]" >&2
+    exit 2
+    ;;
+esac
+```
+
+- [ ] **Step 2: Make the script executable**
+
+Run:
+
+```bash
+chmod +x script/build_and_run.sh
+```
+
+Expected: command exits with status `0`
+
+- [ ] **Step 3: Create the Codex Run action**
+
+Write `.codex/environments/environment.toml` with this content:
+
+```toml
+# THIS IS AUTOGENERATED. DO NOT EDIT MANUALLY
+version = 1
+name = "eqMacFree"
+
+[setup]
+script = ""
+
+[[actions]]
+name = "Run"
+icon = "run"
+command = "./script/build_and_run.sh"
+```
+
+- [ ] **Step 4: Verify the bootstrap files exist and contain the intended entrypoint**
+
+Run:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+files = {
+  'script/build_and_run.sh': ['APP_NAME="eqMacFree"', 'WORKSPACE="native/eqMac.xcworkspace"', 'SCHEME="eqMac"', 'xcodebuild', 'open_app'],
+  '.codex/environments/environment.toml': ['name = "eqMacFree"', 'command = "./script/build_and_run.sh"']
+}
+for file, needles in files.items():
+    text = Path(file).read_text()
+    print(file)
+    for needle in needles:
+        print(' ', needle, needle in text)
+PY
+```
+
+Expected: every check prints `True`
+
+- [ ] **Step 5: Commit the bootstrap**
+
+Run:
+
+```bash
+git add script/build_and_run.sh .codex/environments/environment.toml
+git commit -m "Add eqMacFree build and run bootstrap"
+```
+
+Expected: commit succeeds and only includes the two bootstrap files
+
+---
+
+### Task 2: Create the verification artifacts
+
+**Files:**
+- Create: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md`
+- Create: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+- Create: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md`
+- Reference: `README.md`
+
+- [ ] **Step 1: Create the checklist document**
+
+Write `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md` with this content:
+
+```md
+# eqMacFree Baseline Feature Checklist
+
+**Date:** 2026-04-17  
+**Source of truth:** `/Volumes/ssd/opencode_workspace/eqMac/README.md`
+
+## Status legend
+
+- `Pass`
+- `Partial`
+- `Fail`
+- `Not Run`
+
+## Features
+
+| Feature | Status | Repro Steps | Evidence | Notes |
+| --- | --- | --- | --- | --- |
+| System audio processing | Not Run | Open app, enable eqMacFree pipeline, play system audio, confirm audible routed output |  |  |
+| Volume booster | Not Run | Move booster control, confirm louder output without control desync |  |  |
+| HDMI volume support | Not Run | Select HDMI-capable output, confirm output appears and responds |  |  |
+| Volume balance control | Not Run | Move balance left/right and confirm channel shift |  |  |
+| Basic EQ | Not Run | Switch to Basic EQ, apply preset, confirm audio change |  |  |
+| Advanced EQ | Not Run | Switch to Advanced EQ, adjust bands/preset, confirm audio change |  |  |
+```
+
+- [ ] **Step 2: Create the issue log**
+
+Write `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md` with this content:
+
+```md
+# eqMacFree Baseline Feature Issues
+
+**Date:** 2026-04-17
+
+## Launch blocker
+
+- None recorded yet.
+
+## System audio processing
+
+- None recorded yet.
+
+## Volume booster
+
+- None recorded yet.
+
+## HDMI volume support
+
+- None recorded yet.
+
+## Volume balance control
+
+- None recorded yet.
+
+## Basic EQ
+
+- None recorded yet.
+
+## Advanced EQ
+
+- None recorded yet.
+```
+
+- [ ] **Step 3: Create the gate-decision document**
+
+Write `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md` with this content:
+
+```md
+# eqMacFree Baseline Feature Gate Decision
+
+**Date:** 2026-04-17
+
+## Decision
+
+- Current decision: `Pending`
+
+## Gate rule
+
+- All six `Available now` features must be `Pass`.
+- Any `Partial` or `Fail` blocks former Pro feature implementation.
+
+## Current summary
+
+- Pass count: 0
+- Partial count: 0
+- Fail count: 0
+- Not Run count: 6
+
+## Next action
+
+- Run the app through the bootstrap script and execute the feature checklist.
+```
+
+- [ ] **Step 4: Verify the docs were created correctly**
+
+Run:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+checks = {
+  'docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md': ['System audio processing', 'Volume booster', 'HDMI volume support', 'Volume balance control', 'Basic EQ', 'Advanced EQ'],
+  'docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md': ['## Launch blocker', '## System audio processing', '## Advanced EQ'],
+  'docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md': ['Current decision: `Pending`', 'All six `Available now` features must be `Pass`.']
+}
+for file, needles in checks.items():
+    text = Path(file).read_text()
+    print(file)
+    for needle in needles:
+        print(' ', needle, needle in text)
+PY
+```
+
+Expected: every check prints `True`
+
+- [ ] **Step 5: Commit the verification artifacts**
+
+Run:
+
+```bash
+git add docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md \
+        docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md \
+        docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md
+git commit -m "Add eqMacFree baseline verification artifacts"
+```
+
+Expected: commit succeeds and only includes the three verification documents
+
+---
+
+### Task 3: Verify app launch and system output behavior
+
+**Files:**
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md`
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+- Reference: `script/build_and_run.sh`
+- Reference: `ui/src/app/sections/outputs/outputs.component.ts`
+- Reference: `native/app/Source/Application.swift`
+- Reference: `native/app/Source/Audio/Outputs/Outputs.swift`
+
+- [ ] **Step 1: Verify the app builds and launches**
+
+Run:
+
+```bash
+./script/build_and_run.sh --verify
+```
+
+Expected: exit code `0` and `pgrep -x eqMacFree` succeeds
+
+If this fails:
+
+- add the smallest useful error snippet under `## Launch blocker` in `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+- do not continue to feature verification until the launch blocker is fixed
+
+- [ ] **Step 2: Stream logs while verifying audio startup**
+
+Run:
+
+```bash
+./script/build_and_run.sh --logs
+```
+
+Expected: the app launches and log streaming begins for process `eqMacFree`
+
+Keep this running while checking:
+
+- the app UI opens
+- the audio pipeline starts without immediate crash
+- output selection UI is available
+
+- [ ] **Step 3: Record system audio processing result**
+
+Update the `System audio processing` row in `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md` to one of:
+
+```md
+| System audio processing | Pass | Open app, enable eqMacFree pipeline, play system audio, confirm audible routed output | App launched through `./script/build_and_run.sh --logs`; audio heard through selected output |  |
+| System audio processing | Partial | Open app, enable eqMacFree pipeline, play system audio, confirm audible routed output | Audio routed but unstable or requires retry | Mirror the concrete bullet written in the issue log |
+| System audio processing | Fail | Open app, enable eqMacFree pipeline, play system audio, confirm audible routed output | No audible routed output or pipeline crash | Mirror the concrete bullet written in the issue log |
+```
+
+- [ ] **Step 4: Record HDMI volume support result**
+
+Update the `HDMI volume support` row in `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md` to one of:
+
+```md
+| HDMI volume support | Pass | Select HDMI-capable output, confirm output appears and responds | HDMI device visible and selectable; volume path remains responsive |  |
+| HDMI volume support | Partial | Select HDMI-capable output, confirm output appears and responds | HDMI output visible but switching or control behavior is limited | Mirror the concrete bullet written in the issue log |
+| HDMI volume support | Fail | Select HDMI-capable output, confirm output appears and responds | HDMI output missing or unusable | Mirror the concrete bullet written in the issue log |
+```
+
+If the result is `Partial` or `Fail`, replace the placeholder line in the `## HDMI volume support` section of the issues log with a concrete bullet such as:
+
+```md
+- HDMI output appears in the list but selecting it does not keep routed audio stable.
+```
+
+- [ ] **Step 5: Commit the launch/output evidence**
+
+Run:
+
+```bash
+git add docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md \
+        docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md
+git commit -m "Record baseline launch and output verification"
+```
+
+Expected: commit succeeds and only includes checklist/issue-log updates
+
+---
+
+### Task 4: Verify booster and balance behavior
+
+**Files:**
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md`
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+- Reference: `ui/src/app/sections/volume/booster-balance/booster/booster.component.ts`
+- Reference: `ui/src/app/sections/volume/booster-balance/balance/balance.component.ts`
+- Reference: `native/app/Source/Audio/Volume/Volume.swift`
+- Reference: `native/app/Source/Audio/Volume/VolumeDataBus.swift`
+
+- [ ] **Step 1: Verify the app is running before control checks**
+
+Run:
+
+```bash
+pgrep -x eqMacFree >/dev/null && echo RUNNING
+```
+
+Expected: prints `RUNNING`
+
+If it does not, rerun:
+
+```bash
+./script/build_and_run.sh --verify
+```
+
+- [ ] **Step 2: Record volume booster result**
+
+After moving the booster control in the running app and listening for audible change, update the `Volume booster` row to one of:
+
+```md
+| Volume booster | Pass | Move booster control, confirm louder output without control desync | Booster slider changed output loudness and UI stayed in sync |  |
+| Volume booster | Partial | Move booster control, confirm louder output without control desync | Booster affects output but clips, lags, or desyncs | Mirror the concrete bullet written in the issue log |
+| Volume booster | Fail | Move booster control, confirm louder output without control desync | Booster control has no audible effect or breaks output | Mirror the concrete bullet written in the issue log |
+```
+
+- [ ] **Step 3: Record volume balance result**
+
+After moving the balance control left and right and listening for channel shift, update the `Volume balance control` row to one of:
+
+```md
+| Volume balance control | Pass | Move balance left/right and confirm channel shift | Channel weighting changed as expected and control returned to center cleanly |  |
+| Volume balance control | Partial | Move balance left/right and confirm channel shift | Balance changes but channel movement is inconsistent | Mirror the concrete bullet written in the issue log |
+| Volume balance control | Fail | Move balance left/right and confirm channel shift | No audible left/right shift or control breaks playback | Mirror the concrete bullet written in the issue log |
+```
+
+- [ ] **Step 4: Update the issue log for any non-pass result**
+
+Replace the placeholder line in any affected section with concrete bullets such as:
+
+```md
+## Volume booster
+
+- Booster increases loudness but introduces audible clipping above the upper quarter of the range.
+
+## Volume balance control
+
+- Balance knob moves visually but the output remains centered on HDMI output.
+```
+
+If both pass, replace the placeholder lines with:
+
+```md
+- No issue recorded during baseline verification.
+```
+
+- [ ] **Step 5: Commit the booster/balance evidence**
+
+Run:
+
+```bash
+git add docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md \
+        docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md
+git commit -m "Record baseline booster and balance verification"
+```
+
+Expected: commit succeeds and only includes checklist/issue-log updates
+
+---
+
+### Task 5: Verify Basic EQ and Advanced EQ behavior
+
+**Files:**
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md`
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+- Reference: `ui/src/app/sections/effects/equalizers/equalizers.component.ts`
+- Reference: `ui/src/app/sections/effects/equalizers/basic-equalizer/basic-equalizer.component.ts`
+- Reference: `ui/src/app/sections/effects/equalizers/advanced-equalizer/advanced-equalizer.component.ts`
+- Reference: `native/app/Source/Audio/Effects/Equalizers/Equalizers.swift`
+
+- [ ] **Step 1: Verify Basic EQ behavior**
+
+While the app is running and audio is playing, switch to Basic EQ and apply a clearly audible preset. Then update the `Basic EQ` row to one of:
+
+```md
+| Basic EQ | Pass | Switch to Basic EQ, apply preset, confirm audio change | Preset changes are audible and UI remains responsive |  |
+| Basic EQ | Partial | Switch to Basic EQ, apply preset, confirm audio change | Basic EQ works but preset switching is inconsistent or partially broken | Mirror the concrete bullet written in the issue log |
+| Basic EQ | Fail | Switch to Basic EQ, apply preset, confirm audio change | No audible change or EQ surface is unusable | Mirror the concrete bullet written in the issue log |
+```
+
+- [ ] **Step 2: Verify Advanced EQ behavior**
+
+While the app is running and audio is playing, switch to Advanced EQ and change one or more bands or presets. Then update the `Advanced EQ` row to one of:
+
+```md
+| Advanced EQ | Pass | Switch to Advanced EQ, adjust bands/preset, confirm audio change | Band or preset changes are audible and UI remains responsive |  |
+| Advanced EQ | Partial | Switch to Advanced EQ, adjust bands/preset, confirm audio change | Advanced EQ has some audible effect but one or more controls misbehave | Mirror the concrete bullet written in the issue log |
+| Advanced EQ | Fail | Switch to Advanced EQ, adjust bands/preset, confirm audio change | No audible change or advanced controls are unusable | Mirror the concrete bullet written in the issue log |
+```
+
+- [ ] **Step 3: Update the EQ issue log**
+
+Replace the placeholder line in any affected section with concrete bullets such as:
+
+```md
+## Basic EQ
+
+- Preset switching changes audio, but the selected preset indicator falls out of sync after reopening the window.
+
+## Advanced EQ
+
+- Band sliders move, but the audible effect only applies after toggling the app off and on.
+```
+
+If a section passes cleanly, use:
+
+```md
+- No issue recorded during baseline verification.
+```
+
+- [ ] **Step 4: Verify there are no `Not Run` entries left**
+
+Run:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+text = Path('docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md').read_text()
+print('Not Run' in text)
+PY
+```
+
+Expected: prints `False`
+
+- [ ] **Step 5: Commit the EQ evidence**
+
+Run:
+
+```bash
+git add docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md \
+        docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md
+git commit -m "Record baseline equalizer verification"
+```
+
+Expected: commit succeeds and only includes checklist/issue-log updates
+
+---
+
+### Task 6: Write the final gate decision
+
+**Files:**
+- Modify: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md`
+- Reference: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md`
+- Reference: `docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-issues.md`
+
+- [ ] **Step 1: Compute the status counts from the checklist**
+
+Run:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+text = Path('docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md').read_text()
+for label in ['Pass', 'Partial', 'Fail', 'Not Run']:
+    print(label, text.count(f'| {label} |'))
+PY
+```
+
+Expected: counts reflect the six feature rows
+
+- [ ] **Step 2: Rewrite the gate-decision document with the actual outcome**
+
+Run:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+checklist_path = Path('docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-checklist.md')
+decision_path = Path('docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md')
+text = checklist_path.read_text()
+counts = {label: text.count(f'| {label} |') for label in ['Pass', 'Partial', 'Fail', 'Not Run']}
+decision = 'Pass' if counts['Pass'] == 6 and counts['Partial'] == 0 and counts['Fail'] == 0 and counts['Not Run'] == 0 else 'Blocked'
+next_action = (
+    '- Baseline gate passed. Proceed to the next approved feature plan: `Spatial Audio`.'
+    if decision == 'Pass' else
+    '- Baseline gate failed. Resolve the items listed in `2026-04-17-eqmac-free-baseline-feature-issues.md` before starting `Spatial Audio` implementation.'
+)
+decision_path.write_text(f'''# eqMacFree Baseline Feature Gate Decision
+
+**Date:** 2026-04-17
+
+## Decision
+
+- Current decision: `{decision}`
+
+## Gate rule
+
+- All six `Available now` features must be `Pass`.
+- Any `Partial` or `Fail` blocks former Pro feature implementation.
+
+## Current summary
+
+- Pass count: {counts["Pass"]}
+- Partial count: {counts["Partial"]}
+- Fail count: {counts["Fail"]}
+- Not Run count: {counts["Not Run"]}
+
+## Next action
+
+{next_action}
+''')
+print(decision)
+print(counts)
+PY
+```
+
+Expected: prints either `Pass` or `Blocked`, then prints the four computed counts
+
+- [ ] **Step 3: Verify the decision is internally consistent**
+
+Run:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+text = Path('docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md').read_text()
+checks = [
+    ('has decision line', 'Current decision:' in text),
+    ('has Pass count', '- Pass count:' in text),
+    ('has Next action', '## Next action' in text),
+]
+for label, ok in checks:
+    print(label, ok)
+PY
+```
+
+Expected: every check prints `True`
+
+- [ ] **Step 4: Commit the gate decision**
+
+Run:
+
+```bash
+git add docs/superpowers/verification/2026-04-17-eqmac-free-baseline-feature-gate-decision.md
+git commit -m "Record eqMacFree baseline gate decision"
+```
+
+Expected: commit succeeds and only includes the gate-decision document
+
+- [ ] **Step 5: Hand off according to the result**
+
+Use this rule:
+
+```text
+If Current decision is Pass -> start the approved Spatial Audio execution flow.
+If Current decision is Blocked -> fix baseline issues first and do not start former Pro feature work.
+```
