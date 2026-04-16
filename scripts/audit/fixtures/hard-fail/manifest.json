@@ -1,0 +1,14 @@
+{
+  "targets": ["ui-constants.ts"],
+  "forbiddenPatterns": [
+    {
+      "id": "legacy-eqmac-domain",
+      "severity": "hard",
+      "why": "Legacy production domains must not remain in the public continuation so contributors do not keep shipping the old brand surface.",
+      "expectedFix": "Replace the legacy hostname with the eqMacFree-owned launch-surface value or remove the stale reference entirely.",
+      "patterns": ["eqmac.app"]
+    }
+  ],
+  "restrictedWording": [],
+  "alignmentChecks": []
+}
