@@ -1,0 +1,13 @@
+{
+  "targets": ["README.md"],
+  "forbiddenPatterns": [],
+  "restrictedWording": [
+    {
+      "id": "legacy-paid-language",
+      "severity": "hard",
+      "patterns": ["Pro"],
+      "allowedIn": ["README.md"]
+    }
+  ],
+  "alignmentChecks": []
+}

@@ -1,0 +1,13 @@
+{
+  "targets": ["README.md"],
+  "forbiddenPatterns": [],
+  "restrictedWording": [],
+  "alignmentChecks": [
+    {
+      "id": "readme-feature-buckets",
+      "severity": "warning",
+      "file": "README.md",
+      "requiredSnippets": ["### Available now", "### Lock candidates", "### Missing reimplementation"]
+    }
+  ]
+}
