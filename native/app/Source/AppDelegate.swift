@@ -27,12 +27,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
 
     Application.updater.delegate = self
     Application.updater.feedURL = Settings.updatesFeedUrl
+    Application.updater.automaticallyChecksForUpdates = Application.store.state.settings.doAutoCheckUpdates && Settings.updatesFeedUrl != nil
     
     updateProcessed.once { _ in
       Application.start()
     }
 
-    if (Application.store.state.settings.doAutoCheckUpdates) {
+    if (Application.store.state.settings.doAutoCheckUpdates && Settings.updatesFeedUrl != nil) {
       var stillCheckingConnection = true
       Networking.checkConnected { connected in
         stillCheckingConnection = false
@@ -130,5 +131,4 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
     Application.handleWakeUp()
   }
 }
-
 

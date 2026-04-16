@@ -18,13 +18,13 @@ class Driver {
     if !Driver.isInstalled || !Driver.isCompatible {
       let isIncompatable = Driver.isInstalled && !Driver.isCompatible
       let message = isIncompatable ?
-        "For unknown reason the version of Audio Driver needed for eqMac to work currently is not compatable. Try restarting your computer and run eqMac again. In that doesn't work, try re-installing eqMac from our website."
-        : "For unknown reason the Audio Driver needed for eqMac to work currently is not installed. Try restarting your computer and run eqMac again. In that doesn't work, try re-installing eqMac from our website."
-      let title = isIncompatable ? "The eqMac Audio Driver is Incompatable" : "The eqMac Audio Driver is not installed"
+        "The installed eqMacFree audio driver is incompatible with this app build. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
+        : "The eqMacFree audio driver is not installed. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
+      let title = isIncompatable ? "The eqMacFree audio driver is incompatible" : "The eqMacFree audio driver is not installed"
       Alert.withButtons(
         title: title,
         message: message,
-        buttons: ["Restart Mac", "Re-install eqMac", "Quit"]
+        buttons: ["Restart Mac", "Open eqMacFree repo", "Quit"]
       ) { buttonPressed in
         switch NSApplication.ModalResponse(buttonPressed) {
           case .alertFirstButtonReturn:
@@ -73,7 +73,7 @@ class Driver {
 
   private static func failedToShowPrompt () {
     Alert.confirm(
-    title: "Driver failed to activate", message: "Unfortunately the audio driver has failed to active. You can restart eqMac and try again or quit.", okText: "Try again", cancelText: "Quit") { restart in
+    title: "Driver failed to activate", message: "Unfortunately the audio driver failed to activate. You can restart eqMacFree and try again or quit.", okText: "Try again", cancelText: "Quit") { restart in
       if restart {
         return Application.restart()
       } else {
@@ -169,4 +169,3 @@ class Driver {
   }
   
 }
-

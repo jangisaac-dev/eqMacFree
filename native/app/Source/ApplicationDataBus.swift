@@ -36,12 +36,12 @@ class ApplicationDataBus: DataBus {
     
     self.on(.GET, "/faq") { _, _ in
       NSWorkspace.shared.open(Constants.FAQ_URL)
-      return "FAQ Openned"
+      return "Support page opened"
     }
     
     self.on(.POST, "/bug") { _, _ in
       NSWorkspace.shared.open(Constants.BUG_REPORT_URL)
-      return "Bug Report Openned"
+      return "Issue tracker opened"
     }
     
     self.on(.POST, "/open-url") { data, _ in
@@ -69,9 +69,8 @@ class ApplicationDataBus: DataBus {
     }
     
     self.on(.GET, "/uninstall") { _, res in
-      let url = URL(string: "#uninstall", relativeTo: Constants.FAQ_URL)!
-      NSWorkspace.shared.open(url)
-      return "FAQ Openned"
+      NSWorkspace.shared.open(Constants.REPO_URL)
+      return "Repository opened"
     }
     
     self.on(.GET, "/driver/reinstall/available") { _, res in

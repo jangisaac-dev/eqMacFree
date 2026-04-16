@@ -77,7 +77,7 @@ class Application {
   static var equalizersTypeChangedListener: EventListener<EqualizerType>?
 
   static public func start () {
-    if (!Constants.DEBUG) {
+    if (!Constants.DEBUG && Constants.CRASH_REPORTING_ENABLED) {
       setupCrashReporting()
     }
     
@@ -127,9 +127,13 @@ class Application {
   }
   
   private static func setupCrashReporting () {
+    guard let sentryEndpoint = Constants.SENTRY_ENDPOINT else {
+      return
+    }
+
     // Create a Sentry client and start crash handler
     SentrySDK.start { options in
-      options.dsn = Constants.SENTRY_ENDPOINT
+      options.dsn = sentryEndpoint
       // Only send crash reports if user gave consent
       options.beforeSend = { event in
         if (store.state.settings.doCollectCrashReports) {
@@ -619,6 +623,11 @@ class Application {
   }
   
   static func checkForUpdates () {
+    guard Settings.updatesFeedUrl != nil else {
+      NSWorkspace.shared.open(Constants.RELEASES_URL)
+      return
+    }
+
     updater.checkForUpdates(nil)
   }
   
@@ -680,4 +689,3 @@ class Application {
     }
   }
 }
-
