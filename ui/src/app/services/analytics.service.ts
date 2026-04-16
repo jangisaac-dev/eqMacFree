@@ -5,6 +5,7 @@ import { UIService, UIShownChangedEventCallback } from './ui.service'
 
 declare global {
   interface Window {
+    ga?: (...args: any[]) => void
     gaData: any
     gaGlobal: any
     gaplugins: any
@@ -55,7 +56,7 @@ export class AnalyticsService {
   private async send () {
     const info = await this.app.getInfo()
     const data = {
-      appName: 'eqMac',
+      appName: 'eqMacFree',
       appVersion: `${info.version}`,
       screenName: 'Home',
       dimension1: `${this.ui.version}`,

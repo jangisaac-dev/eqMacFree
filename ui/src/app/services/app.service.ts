@@ -79,7 +79,7 @@ export class ApplicationService extends DataService {
   }
 
   uninstall () {
-    return this.openURL(new URL(`https://${this.CONST.DOMAIN}#uninstall`))
+    return this.openURL(new URL(`https://${this.CONST.DOMAIN}/uninstall`))
   }
 
   lastHaptic: Date
