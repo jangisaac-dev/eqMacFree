@@ -424,7 +424,7 @@ class UI: StoreSubscriber {
       startUILoad(url)
     }
 
-    if (Application.store.state.settings.doOTAUpdates) {
+    if (Application.store.state.settings.doOTAUpdates && Constants.REMOTE_SERVICES_ENABLED) {
       remoteIsReachable() { reachable in
         if reachable {
           loadRemote()
@@ -468,7 +468,7 @@ class UI: StoreSubscriber {
   
   private static func cacheRemote () {
     // Only download ui.zip when UI endpoint is remote
-    if Constants.UI_ENDPOINT_URL.absoluteString.contains(Constants.DOMAIN) {
+    if Constants.REMOTE_SERVICES_ENABLED && Constants.UI_ENDPOINT_URL.absoluteString.contains(Constants.DOMAIN) {
       let remoteZipUrl = "\(Constants.UI_ENDPOINT_URL)/ui.zip"
       Console.log("Caching Remote UI from \(remoteZipUrl)")
       let download = HTTP(URLRequest(urlString: remoteZipUrl)!)

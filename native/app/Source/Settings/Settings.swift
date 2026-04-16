@@ -53,7 +53,7 @@ class Settings: StoreSubscriber {
 
   static var doAutoCheckUpdates = Application.store.state.settings.doAutoCheckUpdates {
     didSet {
-      Application.updater.automaticallyChecksForUpdates = doAutoCheckUpdates
+      Application.updater.automaticallyChecksForUpdates = doAutoCheckUpdates && updatesFeedUrl != nil
     }
   }
 
@@ -63,7 +63,7 @@ class Settings: StoreSubscriber {
     }
   }
 
-  static var updatesFeedUrl: URL! {
+  static var updatesFeedUrl: URL? {
     return Application.store.state.settings.doBetaUpdates ? Constants.BETA_UPDATES_FEED : Constants.UPDATES_FEED
   }
 

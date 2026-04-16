@@ -15,8 +15,8 @@ import BetterCodable
 struct SettingsState: State {
   var iconMode: IconMode = .both
   @DefaultFalse var doCollectCrashReports = false
-  @DefaultTrue var doAutoCheckUpdates = true
-  @DefaultTrue var doOTAUpdates = true
+  @DefaultFalse var doAutoCheckUpdates = false
+  @DefaultFalse var doOTAUpdates = false
   @DefaultFalse var doBetaUpdates = false
 }
 
