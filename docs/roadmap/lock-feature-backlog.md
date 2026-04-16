@@ -14,9 +14,9 @@ Prioritize items that:
 ## Priority 1 — define and ship public-facing feature boundaries
 
 ### 1. Lock-state UX cleanup
-- Replace any remaining ambiguous unavailable-feature copy with clear roadmap messaging
-- Standardize how `Lock` surfaces explain “planned” vs “not yet implemented”
-- Add a lightweight contribution path from lock surfaces to roadmap/issues
+- Replace any remaining ambiguous unavailable-feature copy with clear shared `Lock` wording
+- Standardize how `Lock` surfaces explain “planned” vs “not yet implemented” without paid/unlock semantics
+- Add a lightweight handoff from lock surfaces to roadmap/issues tracking
 
 ### 2. Feature capability audit automation
 - Add a documented checklist or script for auditing user-facing references to unavailable features
