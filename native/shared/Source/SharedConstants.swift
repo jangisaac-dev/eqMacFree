@@ -1,8 +1,8 @@
 import Foundation
 import CoreAudio.AudioServerPlugIn
 
-public let APP_BUNDLE_ID = "com.bitgapp.eqmac"
-public let DRIVER_BUNDLE_ID = "com.bitgapp.eqmac.driver"
+public let APP_BUNDLE_ID = "dev.jangisaac.eqmacfree"
+public let DRIVER_BUNDLE_ID = "dev.jangisaac.eqmacfree.driver"
 
 public struct EQMDeviceCustomProperties: Loopable {
   public let version = AudioObjectPropertySelector.fromString("vrsn")

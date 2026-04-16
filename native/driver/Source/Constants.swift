@@ -26,8 +26,8 @@ let kBytesPerChannel = kBitsPerChannel / 8
 let kBytesPerFrame = kChannelCount * kBytesPerChannel
 let kDataSource_NumberItems: UInt32 = 1
 
-let kEQMDeviceDefaultName = "eqMac"
-let kDeviceManufacturer = "Bitgapp Ltd"
+let kEQMDeviceDefaultName = "eqMacFree"
+let kDeviceManufacturer = "eqMacFree Contributors"
 
 let kDeviceUID = "EQMDevice"
 let kDeviceModelUID = "EQMDeviceModelUID"

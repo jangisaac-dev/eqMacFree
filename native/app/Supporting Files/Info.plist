@@ -38,9 +38,9 @@
 		<dict/>
 	</dict>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>eqMac uses AppleEvents to automate some aspects of the setup process</string>
+	<string>eqMacFree uses AppleEvents to automate selected setup steps for the local audio pipeline.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2017 Roman Kisil. All rights reserved.</string>
+	<string>Copyright © 2026 eqMacFree contributors. Public snapshot derived from the original eqMac project.</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -48,7 +48,7 @@
 	<key>NSPrincipalClass</key>
 	<string>EventInterceptor</string>
 	<key>SUFeedURL</key>
-	<string>https://update.eqmac.app/update.xml</string>
+	<string>https://github.com/jangisaac-dev/eqMacFree/releases</string>
 	<key>SUPublicEDKey</key>
 	<string>hpYxDspWiys38uAkwQl1oxaH4bICfYMofUXN18mMguM=</string>
 </dict>

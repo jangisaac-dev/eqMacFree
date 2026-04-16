@@ -25,7 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1CB8B3641BBBB78D000E2DD1 /* eqMac.driver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = eqMac.driver; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CB8B3641BBBB78D000E2DD1 /* eqMacFree.driver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = eqMacFree.driver; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CB8B3681BBBB78D000E2DD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		781FD6D026DADCE7006CAAEA /* EQMClients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQMClients.swift; sourceTree = "<group>"; };
 		7838E35726C898D60039D466 /* EQMStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQMStream.swift; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 		1CB8B3651BBBB78D000E2DD1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1CB8B3641BBBB78D000E2DD1 /* eqMac.driver */,
+				1CB8B3641BBBB78D000E2DD1 /* eqMacFree.driver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,7 +155,7 @@
 				78F28AD7274D2A940005474D /* Shared */,
 			);
 			productName = EQMDriver;
-			productReference = 1CB8B3641BBBB78D000E2DD1 /* eqMac.driver */;
+			productReference = 1CB8B3641BBBB78D000E2DD1 /* eqMacFree.driver */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -166,7 +166,7 @@
 			attributes = {
 				CLASSPREFIX = EQM_;
 				LastUpgradeCheck = 0900;
-				ORGANIZATIONNAME = Bitgapp;
+				ORGANIZATIONNAME = "eqMacFree Contributors";
 				TargetAttributes = {
 					1CB8B3631BBBB78D000E2DD1 = {
 						CreatedOnToolsVersion = 6.4;
@@ -224,7 +224,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SUDO_ASKPASS=~/askpass.sh\n# Uninstall any new driver leftovers\nsudo -A rm -rf /Library/Audio/Plug-Ins/HAL/eqMac.driver/\n# Install the new driver\nsudo -A cp -f -r \"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\" /Library/Audio/Plug-Ins/HAL/\n# Restart CoreAudio\nsudo -A launchctl kickstart -k system/com.apple.audio.coreaudiod\n";
+			shellScript = "export SUDO_ASKPASS=~/askpass.sh\n# Uninstall any new driver leftovers\nsudo -A rm -rf /Library/Audio/Plug-Ins/HAL/eqMacFree.driver/\n# Install the new driver\nsudo -A cp -f -r \"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\" /Library/Audio/Plug-Ins/HAL/\n# Restart CoreAudio\nsudo -A launchctl kickstart -k system/com.apple.audio.coreaudiod\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -432,7 +432,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
-					"/Library/Audio/Plug-Ins/HAL/eqMac.driver/Contents/Frameworks",
+					"/Library/Audio/Plug-Ins/HAL/eqMacFree.driver/Contents/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MARKETING_VERSION = 1.3.1;
@@ -440,8 +440,8 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bitgapp.eqmac.driver;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.jangisaac.eqmacfree.driver;
+				PRODUCT_NAME = eqMacFree;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -505,14 +505,14 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
-					"/Library/Audio/Plug-Ins/HAL/eqMac.driver/Contents/Frameworks",
+					"/Library/Audio/Plug-Ins/HAL/eqMacFree.driver/Contents/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MARKETING_VERSION = 1.3.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bitgapp.eqmac.driver;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.jangisaac.eqmacfree.driver;
+				PRODUCT_NAME = eqMacFree;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;

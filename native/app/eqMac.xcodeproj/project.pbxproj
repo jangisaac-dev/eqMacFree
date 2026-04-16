@@ -167,7 +167,7 @@
 		E07B45A520FBA4990086AA7E /* Encodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encodable.swift; sourceTree = "<group>"; };
 		E07CB5B021902F4F0033DA89 /* Output.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Output.swift; sourceTree = "<group>"; };
 		E083214620715BBA0038ED1A /* NSOpenPanelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSOpenPanelExtensions.swift; sourceTree = "<group>"; };
-		E086AFFC1FCCB8E700CF9F0D /* eqMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = eqMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E086AFFC1FCCB8E700CF9F0D /* eqMacFree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = eqMacFree.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E086AFFF1FCCB8E700CF9F0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E086B0061FCCB8E700CF9F0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E086B0071FCCB8E700CF9F0D /* eqMacAudio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = eqMacAudio.entitlements; sourceTree = "<group>"; };
@@ -346,7 +346,7 @@
 		E086AFFD1FCCB8E700CF9F0D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E086AFFC1FCCB8E700CF9F0D /* eqMac.app */,
+				E086AFFC1FCCB8E700CF9F0D /* eqMacFree.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -573,8 +573,8 @@
 				78AA48F3270362AA007CDE89 /* BetterCodable */,
 				78F28AD4274D25580005474D /* Shared */,
 			);
-			productName = eqMacAudio;
-			productReference = E086AFFC1FCCB8E700CF9F0D /* eqMac.app */;
+			productName = eqMacFree;
+			productReference = E086AFFC1FCCB8E700CF9F0D /* eqMacFree.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -585,7 +585,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0900;
 				LastUpgradeCheck = 0940;
-				ORGANIZATIONNAME = "Romans Kisils";
+				ORGANIZATIONNAME = "eqMacFree Contributors";
 				TargetAttributes = {
 					E086AFFB1FCCB8E700CF9F0D = {
 						CreatedOnToolsVersion = 9.0;
@@ -705,12 +705,12 @@
 			);
 			inputPaths = (
 			);
-			name = "Run Script - Kill eqMac (DEBUG)";
+			name = "Run Script - Kill eqMacFree (DEBUG)";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\n    pkill -f eqMac.app || true\nfi\n";
+			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\n    pkill -f eqMacFree.app || true\nfi\n";
 		};
 		E06B9AEA2459CAFE00A4D10B /* Run Script - Upload dSYM to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -722,14 +722,14 @@
 			inputPaths = (
 				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
 			);
-			name = "Run Script - Upload dSYM to Sentry";
+			name = "Run Script - Skip legacy Sentry upload";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $CONFIGURATION != \"Release\" ]]; then\nexit 0\nfi\n\nif which sentry-cli >/dev/null; then\nsource ~/.zshrc\nexport SENTRY_ORG=bitgapp\nexport SENTRY_PROJECT=eqmac-swift\nERROR=$(sentry-cli upload-dif \"$DWARF_DSYM_FOLDER_PATH\" --log-level=debug 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nexit 1\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nexit 1\nfi\n";
+			shellScript = "echo \"Skipping legacy Sentry upload for eqMacFree Phase 1\"\nexit 0\n";
 		};
 		E0A48D6223C6028F00700C39 /* Run Script - Hardruntime + Sign Sparkle */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1034,8 +1034,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = v1.3.2;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bitgapp.eqmac;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.jangisaac.eqmacfree;
+				PRODUCT_NAME = eqMacFree;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = singlefile;
@@ -1101,8 +1101,8 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = v1.3.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bitgapp.eqmac;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.jangisaac.eqmacfree;
+				PRODUCT_NAME = eqMacFree;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;

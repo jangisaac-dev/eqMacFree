@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1CB8B3631BBBB78D000E2DD1"
-               BuildableName = "eqMac.driver"
+               BuildableName = "eqMacFree.driver"
                BlueprintName = "eqMac"
                ReferencedContainer = "container:Driver.xcodeproj">
             </BuildableReference>
@@ -46,13 +46,13 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "export SUDO_ASKPASS=~/askpass.sh&#10;# Uninstall any new driver leftovers&#10;sudo -A rm -rf /Library/Audio/Plug-Ins/HAL/eqMac.driver/&#10;# Install the new driver&#10;sudo -A cp -f -r &quot;$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME&quot; /Library/Audio/Plug-Ins/HAL/&#10;# Restart CoreAudio&#10;sudo -A launchctl kickstart -k system/com.apple.audio.coreaudiod&#10;"
+               scriptText = "export SUDO_ASKPASS=~/askpass.sh&#10;# Uninstall any new driver leftovers&#10;sudo -A rm -rf /Library/Audio/Plug-Ins/HAL/eqMacFree.driver/&#10;# Install the new driver&#10;sudo -A cp -f -r &quot;$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME&quot; /Library/Audio/Plug-Ins/HAL/&#10;# Restart CoreAudio&#10;sudo -A launchctl kickstart -k system/com.apple.audio.coreaudiod&#10;"
                shellToInvoke = "/bin/sh">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "1CB8B3631BBBB78D000E2DD1"
-                     BuildableName = "eqMac.driver"
+                     BuildableName = "eqMacFree.driver"
                      BlueprintName = "eqMac"
                      ReferencedContainer = "container:Driver.xcodeproj">
                   </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1CB8B3631BBBB78D000E2DD1"
-            BuildableName = "eqMac.driver"
+             BuildableName = "eqMacFree.driver"
             BlueprintName = "eqMac"
             ReferencedContainer = "container:Driver.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1CB8B3631BBBB78D000E2DD1"
-            BuildableName = "eqMac.driver"
+             BuildableName = "eqMacFree.driver"
             BlueprintName = "eqMac"
             ReferencedContainer = "container:Driver.xcodeproj">
          </BuildableReference>
