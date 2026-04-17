@@ -58,6 +58,19 @@ export class SettingsComponent implements OnInit {
     }
   }
 
+  spatialAudioOption: CheckboxOption = {
+    type: 'checkbox',
+    label: 'Spatial Audio (Experimental)',
+    tooltip: `
+Enable a first-pass room-style spatial effect in the public eqMacFree build.
+This is the current reimplementation track for the historical Spatial Audio feature.
+`,
+    value: false,
+    toggled: spatialAudioEnabled => {
+      this.ui.setSettings({ spatialAudioEnabled })
+    }
+  }
+
   doCollectTelemetryOption: CheckboxOption = {
     type: 'checkbox',
     label: 'Send anonymous usage telemetry',
@@ -312,6 +325,7 @@ This helps maintainers catch issues before broader public rollout.
       this.replaceKnobsWithSlidersOption,
       this.knobControlStyleOption
     ],
+    [ this.spatialAudioOption ],
     [ this.hideShowFeaturesOption ],
 
     [ this.divider ],
@@ -395,6 +409,7 @@ This helps maintainers catch issues before broader public rollout.
     this.alwaysOnTopOption.value = alwaytOnTop
     this.statusItemIconTypeOption.selectedId = statusItemIconType
     this.betaUpdatesOption.value = doBetaUpdates
+    this.spatialAudioOption.value = UISettings.spatialAudioEnabled ?? false
     this.uiScaleSlider.value = uiScale
     this.setUIScaleScreenValue()
   }

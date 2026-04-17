@@ -6,9 +6,11 @@ node_modules
 .env
 dist
 build
+build-driver
 !modules/**/dist
 **/package-lock.json
 **/yarn.lock
 
 native/app/Sandbox.playground/Resources/track.mp3
+native/driver/Driver.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration
 .worktrees/

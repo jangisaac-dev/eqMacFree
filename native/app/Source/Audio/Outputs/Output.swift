@@ -20,6 +20,7 @@ class Output {
   var outputEngine = AVAudioEngine()
   var player = AVAudioPlayerNode()
   var varispeed = AVAudioUnitVarispeed()
+  var spatialAudio = AVAudioUnitReverb()
   let deviceChanged = EmitterKit.Event<AudioDevice>()
   
   var lastSampleTime: Double = -1
@@ -31,6 +32,7 @@ class Output {
   var initialVarispeedRate: Float
   var lowestVarispeedRate: Float
   var highestVarispeedRate: Float
+  private let spatialAudioWetDryMix: Float = 35
 
   init(device: AudioDevice) {
     Console.log("Creating Output for Device: " + device.name)
@@ -54,11 +56,18 @@ class Output {
 
     outputEngine.attach(player)
     outputEngine.attach(varispeed)
+    outputEngine.attach(spatialAudio)
     outputEngine.attach(volume.mixer)
 
+    spatialAudio.loadFactoryPreset(.mediumHall)
+    spatialAudio.wetDryMix = 0
+
     outputEngine.connect(player, to: varispeed, format: format)
-    outputEngine.connect(varispeed, to: volume.mixer, format: format)
+    outputEngine.connect(varispeed, to: spatialAudio, format: format)
+    outputEngine.connect(spatialAudio, to: volume.mixer, format: format)
     outputEngine.connect(volume.mixer, to: outputEngine.mainMixerNode, format: format)
+
+    setSpatialAudioEnabled(Application.store.state.ui.settings["spatialAudioEnabled"].bool ?? false)
     
     self.setupCallback()
     
@@ -66,6 +75,14 @@ class Output {
       self?.start()
       self?.startComputeVarispeedRate()
     }
+  }
+
+  var spatialAudioEnabled: Bool {
+    return spatialAudio.wetDryMix > 0
+  }
+
+  func setSpatialAudioEnabled (_ enabled: Bool) {
+    spatialAudio.wetDryMix = enabled ? spatialAudioWetDryMix : 0
   }
   
   private func setupCallback () {

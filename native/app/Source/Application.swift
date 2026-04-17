@@ -636,6 +636,11 @@ class Application {
     if state.enabled != enabled {
       enabled = state.enabled
     }
+
+    let spatialAudioEnabled = state.ui.settings["spatialAudioEnabled"].bool ?? false
+    if output?.spatialAudioEnabled != spatialAudioEnabled {
+      output?.setSpatialAudioEnabled(spatialAudioEnabled)
+    }
   }
   
   static var supportPath: URL {

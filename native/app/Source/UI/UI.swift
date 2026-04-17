@@ -111,11 +111,26 @@ class UI: StoreSubscriber {
     } else {
       if !fs.fileExists(atPath: localZipPath.path) {
         Console.log("\(localZipPath.path) doesnt exist")
-        let bundleUIZipPath = Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Embedded")!
+        let bundleUIZipPath = bundledUIZipPath()
         try! fs.copyItem(at: bundleUIZipPath, to: localZipPath)
       }
       try! Zip.unzipFile(localZipPath, destination: localPath, overwrite: true, password: nil) // Unzip
     }
+  }
+
+  private static func bundledUIZipPath () -> URL {
+    let subdirectories = [
+      "Embedded",
+      "Assets/Embedded"
+    ]
+
+    for subdirectory in subdirectories {
+      if let url = Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: subdirectory) {
+        return url
+      }
+    }
+
+    fatalError("Missing bundled ui.zip resource")
   }
   
   static var localZipPath: URL {

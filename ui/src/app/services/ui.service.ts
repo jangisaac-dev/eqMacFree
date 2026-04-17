@@ -9,6 +9,7 @@ export interface UISettings {
   doCollectTelemetry?: boolean
   privacyFormSeen?: boolean
   knobControlStyle?: KnobControlStyle
+  spatialAudioEnabled?: boolean
 
   volumeFeatureEnabled?: boolean
   balanceFeatureEnabled?: boolean
@@ -79,6 +80,9 @@ export class UIService extends DataService {
     }
     if (typeof uiSettings.outputFeatureEnabled !== 'boolean') {
       this.settings.outputFeatureEnabled = true
+    }
+    if (typeof uiSettings.spatialAudioEnabled !== 'boolean') {
+      this.settings.spatialAudioEnabled = false
     }
     this.setSettings(this.settings)
 

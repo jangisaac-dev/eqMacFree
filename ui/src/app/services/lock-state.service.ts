@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core'
 import { ConstantsService } from './constants.service'
 
 export type LockFeatureKey =
-  | 'spatial-audio'
   | 'volume-mixer'
   | 'spectrum-analyzer'
   | 'expert-eq'
@@ -24,20 +23,11 @@ export interface LockStateDefinition {
 })
 export class LockStateService {
   private readonly definitions: Record<LockFeatureKey, LockStateDefinition> = {
-    'spatial-audio': {
-      key: 'spatial-audio',
-      label: 'Lock',
-      title: 'Spatial Audio',
-      priority: 1,
-      description: 'This feature is not included in the current eqMacFree public build. It is the first planned former-Pro feature reimplementation target.',
-      roadmapUrl: this.CONST.ROADMAP_URL,
-      issueUrl: this.CONST.FEATURE_REQUEST_URL
-    },
     'volume-mixer': {
       key: 'volume-mixer',
       label: 'Lock',
       title: 'Volume Mixer',
-      priority: 2,
+      priority: 1,
       description: 'This feature is not included in the current eqMacFree public build. It is planned as future public roadmap work.',
       roadmapUrl: this.CONST.ROADMAP_URL,
       issueUrl: this.CONST.FEATURE_REQUEST_URL
@@ -46,7 +36,7 @@ export class LockStateService {
       key: 'spectrum-analyzer',
       label: 'Lock',
       title: 'Spectrum Analyzer',
-      priority: 3,
+      priority: 2,
       description: 'This feature is not included in the current eqMacFree public build. It remains planned public roadmap work.',
       roadmapUrl: this.CONST.ROADMAP_URL,
       issueUrl: this.CONST.FEATURE_REQUEST_URL
@@ -55,7 +45,7 @@ export class LockStateService {
       key: 'expert-eq',
       label: 'Lock',
       title: 'Expert EQ',
-      priority: 4,
+      priority: 3,
       description: 'This feature is not included in the current eqMacFree public build. It remains planned public roadmap work.',
       roadmapUrl: this.CONST.ROADMAP_URL,
       issueUrl: this.CONST.FEATURE_REQUEST_URL
@@ -64,7 +54,7 @@ export class LockStateService {
       key: 'audiounit-hosting',
       label: 'Lock',
       title: 'AudioUnit Hosting',
-      priority: 5,
+      priority: 4,
       description: 'This feature is not included in the current eqMacFree public build. It remains planned public roadmap work.',
       roadmapUrl: this.CONST.ROADMAP_URL,
       issueUrl: this.CONST.FEATURE_REQUEST_URL
