@@ -24,30 +24,31 @@ Prioritize items that:
 
 ## Priority 2 — high-value missing audio features
 
-### 3. Volume mixer
+### 3. Spatial audio
+- Research feasibility against the current native audio pipeline
+- Define a minimal public implementation before UI work starts
+- Treat as the first former-Pro feature target after baseline verification clears
+
+### 4. Volume mixer
 - Investigate per-app volume architecture in the public codebase
 - Define data model, native integration points, and UI surface
 - Deliver as an isolated feature spec and implementation plan
 
-### 4. Spectrum analyzer
+### 5. Spectrum analyzer
 - Research available signal-analysis hooks in the public app/driver stack
 - Decide on rendering strategy and performance budget
 - Build as a self-contained visualization feature
 
 ## Priority 3 — deeper DSP and plugin work
 
-### 5. Expert EQ
+### 6. Expert EQ
 - Define how it differs from existing advanced EQ
 - Decide whether it extends the current EQ engine or introduces a new model
 - Ship only after a dedicated spec and verification plan exist
 
-### 6. AudioUnit hosting
+### 7. AudioUnit hosting
 - Investigate plugin-hosting constraints, UX, and sandbox implications
 - Treat as a separate subsystem with dedicated planning and testing
-
-### 7. Spatial audio
-- Research feasibility against the current native audio pipeline
-- Define a minimal public implementation before UI work starts
 
 ## Working rules for every backlog item
 

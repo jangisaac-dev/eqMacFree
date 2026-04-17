@@ -25,11 +25,11 @@ These are launch-surface items that may still imply unavailable functionality, r
 
 These capabilities were described historically around eqMac but are not materially implemented in the public snapshot and should be treated as new engineering work:
 
-- Expert EQ
-- Spectrum analyzer
-- AudioUnit hosting
 - Spatial audio
 - Volume mixer
+- Spectrum analyzer
+- Expert EQ
+- AudioUnit hosting
 
 ## Phase 1 launch boundary
 

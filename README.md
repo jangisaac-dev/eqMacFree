@@ -25,11 +25,11 @@ eqMacFree is the public launch base for an independent continuation of the last 
 - User-facing copy that still points at the old eqMac product funnel
 
 ### Missing reimplementation
-- Expert EQ
-- Spectrum analyzer
-- AudioUnit hosting
 - Spatial audio
 - Volume mixer
+- Spectrum analyzer
+- Expert EQ
+- AudioUnit hosting
 
 Detailed tracking lives in:
 
