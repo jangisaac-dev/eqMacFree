@@ -1,20 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"
-  xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
-  xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>eqMacFree stable appcast</title>
-    <link>https://github.com/jangisaac-dev/eqMacFree/releases/tag/eqmacfree-v1.0.0</link>
-    <description>A newer public eqMacFree release is available on GitHub Releases.</description>
-    <language>en</language>
-    <item>
-      <title>eqMacFree 1.0.0</title>
-      <link>https://github.com/jangisaac-dev/eqMacFree/releases/tag/eqmacfree-v1.0.0</link>
-      <pubDate>Fri, 17 Apr 2026 09:48:00 GMT</pubDate>
-      <sparkle:version>10000</sparkle:version>
-      <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
-      <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
-      <description><![CDATA[A newer public eqMacFree release is available on GitHub Releases.]]></description>
-    </item>
-  </channel>
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>eqMacFree</title>
+        <item>
+            <title>1.0.1</title>
+            <pubDate>금, 17 4월 2026 19:03:02 +0900</pubDate>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/jangisaac-dev/eqMacFree/releases/download/eqmacfree-v1.0.1/eqMacFree-1.0.1.zip" sparkle:version="10001" sparkle:shortVersionString="1.0.1" length="12486474" type="application/octet-stream" sparkle:edSignature="Su17pX/Qx0G/mVoOvtIpt9DTF76jC66+syYQKaK+ZFFYgb+DkLju1zAC1YnZJwo1z3U+EaN9CCAEOXTQyNlbAQ=="/>
+        </item>
+    </channel>
 </rss>

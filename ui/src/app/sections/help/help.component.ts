@@ -32,6 +32,19 @@ export class HelpComponent implements OnInit {
   }
 
   buildOptions () {
+    const primaryActions: ButtonOption[] = [
+      {
+        type: 'button',
+        label: 'FAQ',
+        action: this.faq.bind(this)
+      },
+      {
+        type: 'button',
+        label: 'Report a Bug',
+        action: this.reportBug.bind(this)
+      }
+    ]
+
     const lockButtons = this.lockState.listDefinitions().map(definition => ({
       type: 'button',
       label: `${definition.title} · ${definition.label}`,
@@ -39,17 +52,7 @@ export class HelpComponent implements OnInit {
     } as ButtonOption))
 
     this.options = [
-      [
-        {
-          type: 'button',
-          label: 'FAQ',
-          action: this.faq.bind(this)
-        }, {
-          type: 'button',
-          label: 'Report a Bug',
-          action: this.reportBug.bind(this)
-        }
-      ],
+      primaryActions,
       lockButtons.slice(0, 2),
       lockButtons.slice(2, 4),
       lockButtons.slice(4, 5)

@@ -318,48 +318,56 @@ This helps maintainers catch issues before broader public rollout.
   }
 
   private readonly divider: DividerOption = { type: 'divider', orientation: 'horizontal' }
-  settings: Options = [
-    [ this.uiScaleLabel, this.uiScaleSlider, this.uiScaleScreen ],
-    [ this.iconModeOption ],
-    [ this.statusItemIconTypeOption ],
-    [
-      this.launchOnStartupOption,
-      this.alwaysOnTopOption
-    ],
-    [
-      this.replaceKnobsWithSlidersOption,
-      this.knobControlStyleOption
-    ],
-    [ this.spatialAudioOption ],
-    [ this.hideShowFeaturesOption ],
+  private readonly updatesLabel: LabelOption = { type: 'label', label: 'Updates' }
+  private readonly privacyLabel: LabelOption = { type: 'label', label: 'Privacy' }
 
-    [ this.divider ],
+  get settings (): Options {
+    const options: Options = [
+      [ this.uiScaleLabel, this.uiScaleSlider, this.uiScaleScreen ],
+      [ this.iconModeOption ],
+      [ this.statusItemIconTypeOption ],
+      [
+        this.launchOnStartupOption,
+        this.alwaysOnTopOption
+      ],
+      [
+        this.replaceKnobsWithSlidersOption,
+        this.knobControlStyleOption
+      ],
+      [ this.spatialAudioOption ],
+      [ this.hideShowFeaturesOption ],
 
-    [ { type: 'label', label: 'Updates' } ],
-    [
-      this.betaUpdatesOption,
-      this.autoCheckUpdatesOption,
-      this.otaUpdatesOption
-    ],
-    [
-      this.updateOption
-    ],
+      [ this.divider ],
 
-    ...(this.CONST.TELEMETRY_ENABLED || this.CONST.CRASH_REPORTING_ENABLED
-      ? [
-          [ this.divider ],
-          [ { type: 'label', label: 'Privacy' } ],
-          [
-            this.doCollectTelemetryOption,
-            this.doCollectCrashReportsOption
-          ]
+      [ this.updatesLabel ],
+      [
+        this.betaUpdatesOption,
+        this.autoCheckUpdatesOption,
+        this.otaUpdatesOption
+      ],
+      [
+        this.updateOption
+      ]
+    ]
+
+    if (this.CONST.TELEMETRY_ENABLED || this.CONST.CRASH_REPORTING_ENABLED) {
+      options.push(
+        [ this.divider ],
+        [ this.privacyLabel ],
+        [
+          this.doCollectTelemetryOption,
+          this.doCollectCrashReportsOption
         ]
-      : []),
+      )
+    }
 
-    [ this.divider ],
-    // Misc
-    [ this.uninstallOption ]
-  ]
+    options.push(
+      [ this.divider ],
+      [ this.uninstallOption ]
+    )
+
+    return options
+  }
 
   constructor (
     public settingsService: SettingsService,

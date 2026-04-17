@@ -1,6 +1,6 @@
 {
   "name": "eqmac-free",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "eqMacFree monorepo",
   "main": ".eslintrc.js",
   "private": true,
@@ -16,7 +16,9 @@
   "scripts": {
     "lint": "npx eslint .",
     "audit:boundary": "node scripts/audit/run-boundary-audit.mjs",
-    "release:prepare": "node scripts/release/prepare-release.mjs"
+    "release:prepare": "node scripts/release/prepare-release.mjs",
+    "release:build": "bash scripts/release/build-distribution.sh",
+    "release:publish": "bash scripts/release/publish-release.sh"
   },
   "repository": {
     "type": "git",

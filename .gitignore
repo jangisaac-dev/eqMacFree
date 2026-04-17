@@ -7,10 +7,13 @@ node_modules
 dist
 build
 build-driver
+build-release
+release-artifacts
 !modules/**/dist
 **/package-lock.json
 **/yarn.lock
 
+native/app/Embedded
 native/app/Sandbox.playground/Resources/track.mp3
 native/driver/Driver.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration
 .worktrees/
