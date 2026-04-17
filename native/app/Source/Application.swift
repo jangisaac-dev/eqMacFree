@@ -112,10 +112,7 @@ class Application {
     
     equalizersTypeChangedListener = Equalizers.typeChanged.on { _ in
       if (enabled) {
-        stopSave {}
-        Async.delay(100) {
-          setupAudio()
-        }
+        rebuildAudioPipeline()
       }
       
     }
@@ -298,13 +295,34 @@ class Application {
     AudioDevice.currentOutputDevice = Driver.device!
     AudioDevice.currentSystemDevice = Driver.device!
 
-    // TODO: Figure out a better way
-    Async.delay(1000) {
+    waitForDriverActivation {
       ignoreEvents = false
       createAudioPipeline()
       startingPassthrough = false
       completion?()
     }
+  }
+
+  private static func waitForDriverActivation (timeoutMs: UInt = 1000, pollMs: UInt = 50, completion: @escaping () -> Void) {
+    let startedAt = Time.stamp
+
+    func finishIfReady () {
+      if AudioDevice.currentOutputDevice.id == Driver.device!.id {
+        completion()
+        return
+      }
+
+      if Time.stamp - startedAt >= timeoutMs {
+        completion()
+        return
+      }
+
+      Async.delay(pollMs) {
+        finishIfReady()
+      }
+    }
+
+    finishIfReady()
   }
 
   private static func getLastKnowDeviceFromStack () -> AudioDevice {
@@ -385,6 +403,23 @@ class Application {
       }
     }
     audioPipelineIsRunning.emit()
+  }
+
+  private static func rebuildAudioPipeline () {
+    guard selectedDevice != nil else {
+      return setupAudio()
+    }
+
+    ignoreEvents = true
+    selectedDeviceVolumeChangedListener?.isListening = false
+    selectedDeviceVolumeChangedListener = nil
+    selectedDeviceSampleRateChangedListener?.isListening = false
+    selectedDeviceSampleRateChangedListener = nil
+    output?.stop()
+    engine?.stop()
+    removeEngines()
+    createAudioPipeline()
+    ignoreEvents = false
   }
   
   private static func setupUI (_ completion: @escaping () -> Void) {
@@ -629,6 +664,10 @@ class Application {
   }
   
   static var version: String {
+    return Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+  }
+
+  static var buildNumber: String {
     return Bundle.main.infoDictionary!["CFBundleVersion"] as! String
   }
   

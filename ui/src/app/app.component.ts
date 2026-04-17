@@ -12,6 +12,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { TransitionService } from './services/transitions.service'
 import { AnalyticsService } from './services/analytics.service'
 import { ApplicationService } from './services/app.service'
+import { ConstantsService } from './services/constants.service'
 import { SettingsService, IconMode } from './sections/settings/settings.service'
 import { ToastService } from './services/toast.service'
 import { OptionsDialogComponent } from './components/options-dialog/options-dialog.component'
@@ -67,6 +68,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     public transitions: TransitionService,
     public analytics: AnalyticsService,
     public app: ApplicationService,
+    public CONST: ConstantsService,
     public settings: SettingsService,
     public toast: ToastService
   ) {
@@ -137,15 +139,39 @@ export class AppComponent implements OnInit, AfterContentInit {
       this.ui.getSettings()
     ])
 
+    if (!this.CONST.TELEMETRY_ENABLED && !this.CONST.CRASH_REPORTING_ENABLED) {
+      if (typeof uiSettings.privacyFormSeen !== 'boolean') {
+        await Promise.all([
+          this.ui.setSettings({
+            privacyFormSeen: true,
+            doCollectTelemetry: false
+          }),
+          this.settings.setDoCollectCrashReports({
+            doCollectCrashReports: false
+          })
+        ])
+      }
+      return
+    }
+
     if (typeof uiSettings.privacyFormSeen !== 'boolean') {
       let doCollectTelemetry = uiSettings.doCollectTelemetry ?? false
       let doCollectCrashReports = await this.settings.getDoCollectCrashReports()
       let saving = false
+      const privacyOptions: Options = [
+        [ { type: 'label', label: 'Privacy' } ],
+        [ {
+          type: 'label', label: `eqMacFree respects your privacy
+and lets you choose what anonymous data to share with the maintainers.
+That data helps improve reliability and prioritize public roadmap work.`
+        } ]
+      ]
 
-      const doCollectTelemetryOption: Option = {
-        type: 'checkbox',
-        label: 'Send anonymous usage telemetry',
-        tooltip: `
+      if (this.CONST.TELEMETRY_ENABLED) {
+        const doCollectTelemetryOption: Option = {
+          type: 'checkbox',
+          label: 'Send anonymous usage telemetry',
+          tooltip: `
 eqMacFree can collect anonymous usage data such as:
 
 • macOS version
@@ -154,43 +180,42 @@ eqMacFree can collect anonymous usage data such as:
 
 This helps maintainers understand how the public app is used.
 `,
-        tooltipAsComponent: true,
-        value: doCollectTelemetry,
-        isEnabled: () => !saving,
-        toggled: doCollect => {
-          doCollectTelemetry = doCollect
+          tooltipAsComponent: true,
+          value: doCollectTelemetry,
+          isEnabled: () => !saving,
+          toggled: doCollect => {
+            doCollectTelemetry = doCollect
+          }
         }
+        privacyOptions.push([ doCollectTelemetryOption ])
       }
 
-      const doCollectCrashReportsOption: Option = {
-        type: 'checkbox',
-        label: 'Send anonymous crash reports',
-        tooltip: `
+      if (this.CONST.CRASH_REPORTING_ENABLED) {
+        const doCollectCrashReportsOption: Option = {
+          type: 'checkbox',
+          label: 'Send anonymous crash reports',
+          tooltip: `
 eqMacFree can send anonymized crash reports
 to the maintainers if the app crashes.
 This helps us diagnose stability problems
 and improve the public release.
 `,
-        tooltipAsComponent: true,
-        value: doCollectCrashReports,
-        isEnabled: () => !saving,
-        toggled: doCollect => {
-          doCollectCrashReports = doCollect
+          tooltipAsComponent: true,
+          value: doCollectCrashReports,
+          isEnabled: () => !saving,
+          toggled: doCollect => {
+            doCollectCrashReports = doCollect
+          }
         }
+        privacyOptions.push([ doCollectCrashReportsOption ])
       }
+
       const privacyDialog: MatDialogRef<OptionsDialogComponent> = this.dialog.open(OptionsDialogComponent, {
         hasBackdrop: true,
         disableClose: true,
         data: {
           options: [
-            [ { type: 'label', label: 'Privacy' } ],
-            [ {
-              type: 'label', label: `eqMacFree respects your privacy
-and lets you choose what anonymous data to share with the maintainers.
-That data helps improve reliability and prioritize public roadmap work.`
-            } ],
-            [ doCollectTelemetryOption ],
-            [ doCollectCrashReportsOption ],
+            ...privacyOptions,
             [
               {
                 type: 'button',
@@ -203,10 +228,8 @@ That data helps improve reliability and prioritize public roadmap work.`
                 label: 'Accept all',
                 isEnabled: () => !saving,
                 action: async () => {
-                  doCollectCrashReports = true
-                  doCollectTelemetry = true
-                  doCollectCrashReportsOption.value = true
-                  doCollectTelemetryOption.value = true
+                  doCollectCrashReports = this.CONST.CRASH_REPORTING_ENABLED
+                  doCollectTelemetry = this.CONST.TELEMETRY_ENABLED
                   saving = true
                   await this.utils.delay(200)
                   privacyDialog.close()
@@ -230,7 +253,7 @@ That data helps improve reliability and prioritize public roadmap work.`
       ])
     }
 
-    if (uiSettings.doCollectTelemetry) {
+    if (this.CONST.TELEMETRY_ENABLED && uiSettings.doCollectTelemetry) {
       await this.analytics.init()
     }
   }

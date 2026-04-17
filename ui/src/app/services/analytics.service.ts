@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { UtilitiesService } from './utilities.service'
 import { ApplicationService } from './app.service'
+import { ConstantsService } from './constants.service'
 import { UIService, UIShownChangedEventCallback } from './ui.service'
 
 declare global {
@@ -19,6 +20,7 @@ export class AnalyticsService {
   constructor (
     public utils: UtilitiesService,
     public app: ApplicationService,
+    private readonly CONST: ConstantsService,
     private readonly ui: UIService
   ) {}
 
@@ -31,6 +33,7 @@ export class AnalyticsService {
   }
 
   async init () {
+    if (!this.CONST.TELEMETRY_ENABLED) return
     if (this.injected) return
 
     await UtilitiesService.injectScript({

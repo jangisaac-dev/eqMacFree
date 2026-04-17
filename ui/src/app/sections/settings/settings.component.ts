@@ -4,6 +4,7 @@ import { SettingsService, IconMode } from './settings.service'
 import { ApplicationService } from '../../services/app.service'
 import { MatDialog } from '@angular/material/dialog'
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component'
+import { ConstantsService } from '../../services/constants.service'
 import { StatusItemIconType, UIService } from '../../services/ui.service'
 import { AnalyticsService } from '../../services/analytics.service'
 import { SemanticVersion } from '../../services/semantic-version.service'
@@ -83,8 +84,10 @@ eqMacFree can collect anonymous usage data such as:
 
 This helps maintainers understand how the public app is used.
 `,
+    isEnabled: () => this.CONST.TELEMETRY_ENABLED,
     value: false,
     toggled: doCollectTelemetry => {
+      if (!this.CONST.TELEMETRY_ENABLED) return
       this.ui.setSettings({ doCollectTelemetry })
       if (doCollectTelemetry) {
         this.analytics.init()
@@ -103,8 +106,10 @@ to the maintainers if the app crashes.
 This helps us diagnose stability problems
 and improve the public release.
 `,
+    isEnabled: () => this.CONST.CRASH_REPORTING_ENABLED,
     value: false,
     toggled: doCollectCrashReports => {
+      if (!this.CONST.CRASH_REPORTING_ENABLED) return
       this.settingsService.setDoCollectCrashReports({
         doCollectCrashReports
       })
@@ -340,14 +345,16 @@ This helps maintainers catch issues before broader public rollout.
       this.updateOption
     ],
 
-    [ this.divider ],
-
-    // Privacy
-    [ { type: 'label', label: 'Privacy' } ],
-    [
-      this.doCollectTelemetryOption,
-      this.doCollectCrashReportsOption
-    ],
+    ...(this.CONST.TELEMETRY_ENABLED || this.CONST.CRASH_REPORTING_ENABLED
+      ? [
+          [ this.divider ],
+          [ { type: 'label', label: 'Privacy' } ],
+          [
+            this.doCollectTelemetryOption,
+            this.doCollectCrashReportsOption
+          ]
+        ]
+      : []),
 
     [ this.divider ],
     // Misc
@@ -359,6 +366,7 @@ This helps maintainers catch issues before broader public rollout.
     public app: ApplicationService,
     public dialog: MatDialog,
     public ui: UIService,
+    public CONST: ConstantsService,
     public analytics: AnalyticsService,
     private readonly changeRef: ChangeDetectorRef
   ) {

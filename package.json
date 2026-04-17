@@ -15,7 +15,8 @@
   },
   "scripts": {
     "lint": "npx eslint .",
-    "audit:boundary": "node scripts/audit/run-boundary-audit.mjs"
+    "audit:boundary": "node scripts/audit/run-boundary-audit.mjs",
+    "release:prepare": "node scripts/release/prepare-release.mjs"
   },
   "repository": {
     "type": "git",

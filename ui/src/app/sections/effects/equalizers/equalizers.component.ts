@@ -129,10 +129,9 @@ export class EqualizersComponent implements OnInit, OnDestroy {
   }
 
   async setType (type: EqualizerType) {
-    if (!this.app.enabled) return
-    await this.service.setType(type)
+    if (!this.app.enabled || this.type === type) return
     this.type = type
-    await this.utils.delay(this.animationDuration)
+    await this.service.setType(type)
   }
 
   public getEqualizerFromType (type: EqualizerType): EqualizerComponent {

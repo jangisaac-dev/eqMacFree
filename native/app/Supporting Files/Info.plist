@@ -48,7 +48,7 @@
 	<key>NSPrincipalClass</key>
 	<string>EventInterceptor</string>
 	<key>SUFeedURL</key>
-	<string>https://github.com/jangisaac-dev/eqMacFree/releases</string>
+	<string>https://raw.githubusercontent.com/jangisaac-dev/eqMacFree/main/docs/appcast/stable.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>hpYxDspWiys38uAkwQl1oxaH4bICfYMofUXN18mMguM=</string>
 </dict>
