@@ -10,6 +10,14 @@ DRIVER_PROJECT="native/driver/Driver.xcodeproj"
 DRIVER_SCHEME="Driver - Debug"
 SYSTEM_DRIVER_DIR="/Library/Audio/Plug-Ins/HAL"
 SYSTEM_DRIVER_BUNDLE="$SYSTEM_DRIVER_DIR/$APP_NAME.driver"
+FORCE_DRIVER_INSTALL=0
+
+case "$MODE" in
+  --install-driver|install-driver|--reinstall-driver|reinstall-driver)
+    FORCE_DRIVER_INSTALL=1
+    MODE="run"
+    ;;
+esac
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DERIVED_DATA="$ROOT_DIR/build"
@@ -31,6 +39,11 @@ install_driver() {
   if [[ ! -d "$DRIVER_BUNDLE" ]]; then
     echo "Driver bundle missing at $DRIVER_BUNDLE" >&2
     return 1
+  fi
+
+  if [[ "$FORCE_DRIVER_INSTALL" -eq 0 && -d "$SYSTEM_DRIVER_BUNDLE" ]]; then
+    echo "Driver already installed at $SYSTEM_DRIVER_BUNDLE"
+    return 0
   fi
 
   if sudo -n true >/dev/null 2>&1; then
@@ -89,7 +102,7 @@ case "$MODE" in
     pgrep -x "$APP_NAME" >/dev/null
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify]" >&2
+    echo "usage: $0 [run|install-driver|reinstall-driver|--debug|--logs|--telemetry|--verify]" >&2
     exit 2
     ;;
 esac
