@@ -72,3 +72,22 @@ npm run release:publish
 ```
 
 Keep `docs/appcast/stable.xml` and `docs/appcast/beta.xml` on the default branch aligned with the latest public release.
+
+## Final clean-history cutover
+
+When the product reaches the point where only the newest public version should remain:
+
+```bash
+VERSION=1.2.0 BUILD_NUMBER=10200 bash scripts/release/finalize-clean-cutover.sh
+```
+
+What this does:
+
+- creates a local backup branch before any destructive change
+- creates a new orphan release branch containing only the current tree snapshot
+- tags that snapshot with the requested `eqmacfree-v*` tag
+- deletes older GitHub releases
+- deletes older remote tags
+- force-updates remote `main` so only the final snapshot history remains
+
+This should be run only after the final feature batch is complete and verified.
