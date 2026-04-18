@@ -5,9 +5,9 @@ MODE="${1:-run}"
 APP_NAME="eqMacFree"
 WORKSPACE="native/eqMac.xcworkspace"
 SCHEME="eqMac"
-CONFIGURATION="Debug"
+CONFIGURATION="${EQMAC_CONFIGURATION:-Release}"
 DRIVER_PROJECT="native/driver/Driver.xcodeproj"
-DRIVER_SCHEME="Driver - Debug"
+DRIVER_SCHEME="Driver - ${CONFIGURATION}"
 SYSTEM_DRIVER_DIR="/Library/Audio/Plug-Ins/HAL"
 SYSTEM_DRIVER_BUNDLE="$SYSTEM_DRIVER_DIR/$APP_NAME.driver"
 FORCE_DRIVER_INSTALL=0
@@ -20,11 +20,21 @@ case "$MODE" in
 esac
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DERIVED_DATA="$ROOT_DIR/build"
-DRIVER_DERIVED_DATA="$ROOT_DIR/build-driver"
+if [[ "$CONFIGURATION" == "Release" ]]; then
+  DERIVED_DATA="$ROOT_DIR/build-release"
+  DRIVER_DERIVED_DATA="$ROOT_DIR/build-driver-release"
+else
+  DERIVED_DATA="$ROOT_DIR/build"
+  DRIVER_DERIVED_DATA="$ROOT_DIR/build-driver"
+fi
 DRIVER_BUNDLE="$DRIVER_DERIVED_DATA/Build/Products/$CONFIGURATION/$APP_NAME.driver"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/$CONFIGURATION/$APP_NAME.app"
 APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+
+bundle_version() {
+  local bundle_path="$1"
+  /usr/bin/defaults read "$bundle_path/Contents/Info" CFBundleVersion 2>/dev/null || true
+}
 
 build_driver() {
   xcodebuild \
@@ -42,14 +52,22 @@ install_driver() {
   fi
 
   if [[ "$FORCE_DRIVER_INSTALL" -eq 0 && -d "$SYSTEM_DRIVER_BUNDLE" ]]; then
-    echo "Driver already installed at $SYSTEM_DRIVER_BUNDLE"
-    return 0
+    local built_version installed_version
+    built_version="$(bundle_version "$DRIVER_BUNDLE")"
+    installed_version="$(bundle_version "$SYSTEM_DRIVER_BUNDLE")"
+
+    if [[ -n "$built_version" && "$built_version" == "$installed_version" ]]; then
+      echo "Driver already installed at $SYSTEM_DRIVER_BUNDLE"
+      return 0
+    fi
+
+    echo "Installed driver version (${installed_version:-unknown}) differs from built version (${built_version:-unknown}); reinstalling."
   fi
 
   if sudo -n true >/dev/null 2>&1; then
     sudo rm -rf "$SYSTEM_DRIVER_BUNDLE"
     sudo cp -R "$DRIVER_BUNDLE" "$SYSTEM_DRIVER_DIR/"
-    sudo launchctl kickstart -k system/com.apple.audio.coreaudiod
+    sudo launchctl kickstart -k system/com.apple.audio.coreaudiod || sudo pkill -x coreaudiod || true
     return 0
   fi
 
@@ -57,7 +75,7 @@ install_driver() {
     export SUDO_ASKPASS="$HOME/askpass.sh"
     sudo -A rm -rf "$SYSTEM_DRIVER_BUNDLE"
     sudo -A cp -R "$DRIVER_BUNDLE" "$SYSTEM_DRIVER_DIR/"
-    sudo -A launchctl kickstart -k system/com.apple.audio.coreaudiod
+    sudo -A launchctl kickstart -k system/com.apple.audio.coreaudiod || sudo -A pkill -x coreaudiod || true
     return 0
   fi
 

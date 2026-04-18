@@ -241,6 +241,9 @@ class Output {
   }
   
   func stop () {
+    stopComputeVarispeedRate()
+    player.stop()
     outputEngine.stop()
+    outputEngine.reset()
   }
 }

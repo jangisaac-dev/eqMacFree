@@ -94,10 +94,23 @@ class ApplicationDataBus: DataBus {
       return [ "enabled": Application.store.state.enabled ]
     }
 
-    self.on(.POST, "/enabled") { data, _ in
+    self.on(.POST, "/enabled") { data, res in
       if let enabled = data["enabled"] as? Bool {
+        Console.log("POST /enabled", "enabled=\(enabled)")
+        if Application.audioTransitionInFlight {
+          throw "Audio processing toggle is already in progress"
+        }
+
+        if Application.store.state.enabled == enabled {
+          return [ "enabled": enabled ]
+        }
+
+        Application.audioTransitionInFlight = true
+        Application.audioTransitionCompleted.once { finalEnabled in
+          res.send([ "enabled": finalEnabled ])
+        }
         Application.dispatchAction(ApplicationAction.setEnabled(enabled))
-        return "Enabled has been set"
+        return nil
       }
       throw "Invalid 'enabled' parameter, must be a boolean"
     }

@@ -1,6 +1,6 @@
 <div fxLayout="row" class="toolbar w-100" [style.min-height.px]="toolbarHeight" fxLayoutAlign="space-between center" >
     <div fxFlex="20" fxLayoutGap="10px" fxLayout="row" fxLayoutAlign="start center">
-      <eqm-toggle [enabled]="app.enabled" [highlighted]="enabledToggleHighlighted" [(state)]="enabled" (stateChange)="setEnabled()"></eqm-toggle>
+      <eqm-toggle [enabled]="app.enabled" [highlighted]="enabledToggleHighlighted" [state]="enabled" (stateChange)="setEnabled($event)"></eqm-toggle>
       <eqm-icon [@FadeInOut] *ngIf="activeEqualizer && activeEqualizer.settings.length" (click)="openSettings()" eqmTooltip="Settings" eqmTooltipPositionSide="bottom" name="cog" color="#8E8E93" [size]="16"></eqm-icon>
     </div>
 

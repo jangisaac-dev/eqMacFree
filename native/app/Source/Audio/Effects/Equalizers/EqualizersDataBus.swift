@@ -15,6 +15,7 @@ class EqualizersDataBus: DataBus {
     return Application.store.state.effects.equalizers
   }
   
+  var enabledChangedListener: EventListener<Bool>?
   var typeChangedListener: EventListener<EqualizerType>?
 
   required init(route: String, bridge: Bridge) {
@@ -29,6 +30,7 @@ class EqualizersDataBus: DataBus {
       if (enabled == nil) {
         throw "Invalid 'enabled' value, must be a valid Boolean value"
       }
+      Console.log("POST /effects/equalizers/enabled", "enabled=\(enabled!)")
       Application.dispatchAction(EqualizersAction.setEnabled(enabled!))
       return "Enabled state has been set"
     }
@@ -57,6 +59,10 @@ class EqualizersDataBus: DataBus {
     
     self.add("/basic", BasicEqualizerDataBus.self)
     self.add("/advanced", AdvancedEqualizerDataBus.self)
+
+    enabledChangedListener = Equalizers.enabledChanged.on { enabled in
+      self.send(to: "/enabled", data: [ "enabled": enabled ])
+    }
 
     typeChangedListener = Equalizers.typeChanged.on { type in
       self.send(to: "/type", data: [ "type": type.rawValue ])

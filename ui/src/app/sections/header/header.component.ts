@@ -17,6 +17,7 @@ export class HeaderComponent implements OnInit {
   showBooleanDebouncers: { [name: string]: any } = {}
   uiMode: UIMode
   appEnabled: boolean = true
+  toggleInFlight = false
   @HostBinding('style.height.px') height = 25
 
   @Output() settingsToggled = new EventEmitter()
@@ -111,7 +112,23 @@ export class HeaderComponent implements OnInit {
   // }
 
   async setAppEnabled (appEnabled: boolean) {
+    if (this.toggleInFlight) return
+
+    const previousValue = this.appEnabled
+    this.toggleInFlight = true
     this.appEnabled = appEnabled
-    this.app.setEnabled(this.appEnabled)
+
+    try {
+      this.appEnabled = await this.app.setEnabled(appEnabled)
+    } catch (error) {
+      this.appEnabled = previousValue
+      this.app.enabled = previousValue
+      this.app.toast.show({
+        message: 'Audio processing toggle failed. Check eqMacFree.log.',
+        type: 'warning'
+      })
+    } finally {
+      this.toggleInFlight = false
+    }
   }
 }

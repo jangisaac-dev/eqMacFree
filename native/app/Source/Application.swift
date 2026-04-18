@@ -34,6 +34,7 @@ class Application {
   static var outputCreated = EmitterKit.Event<Void>()
 
   static var selectedDevice: AudioDevice?
+  static var lastKnownInputDevice: AudioDevice?
   static var selectedDeviceIsAliveListener: EventListener<AudioDevice>?
   static var selectedDeviceVolumeChangedListener: EventListener<AudioDevice>?
   static var selectedDeviceSampleRateChangedListener: EventListener<AudioDevice>?
@@ -41,7 +42,9 @@ class Application {
   static var lastKnownDeviceStack: [AudioDevice] = []
 
   static let audioPipelineIsRunning = EmitterKit.Event<Void>()
+  static let audioTransitionCompleted = EmitterKit.Event<Bool>()
   static var audioPipelineIsRunningListener: EmitterKit.EventListener<Void>?
+  static var audioTransitionInFlight = false
   private static var ignoreEvents = false
   private static var ignoreVolumeEvents = false
 
@@ -68,6 +71,7 @@ class Application {
   static var enabled = store.state.enabled {
     didSet {
       if (oldValue != enabled) {
+        Console.log("Application.enabled didSet", "old=\(oldValue)", "new=\(enabled)")
         enabledChanged.emit(enabled)
       }
     }
@@ -75,17 +79,40 @@ class Application {
   
   static var equalizersTypeChangedListener: EventListener<EqualizerType>?
 
+  private static func applyProcessingEnabledState(_ enabled: Bool) {
+    Console.log("applyProcessingEnabledState", "enabled=\(enabled)")
+    engine?.equalizers.enabled = enabled
+  }
+
   static public func start () {
+    Console.log(
+      "Application.start",
+      "store.enabled=\(store.state.enabled)",
+      "enabled=\(enabled)",
+      "driver.installed=\(Driver.isInstalled)",
+      "driver.pluginId=\(String(describing: Driver.pluginId))",
+      "driver.deviceId=\(String(describing: Driver.device?.id))"
+    )
     self.settings = Settings()
 
     Networking.startMonitor()
     
     Driver.check {
+      Console.log(
+        "Driver.check completed",
+        "store.enabled=\(store.state.enabled)",
+        "enabled=\(enabled)",
+        "inputPermission=\(InputSource.hasPermission)"
+      )
       Sources.getInputPermission {
+        Console.log(
+          "Input permission callback",
+          "store.enabled=\(store.state.enabled)",
+          "enabled=\(enabled)"
+        )
         AudioHardware.sharedInstance.enableDeviceMonitoring()
-
-        if enabled {
-          setupAudio()
+        setupAudio {
+          applyProcessingEnabledState(enabled)
         }
 
         setupListeners()
@@ -103,10 +130,19 @@ class Application {
 
   private static func setupListeners () {
     enabledChangedListener = enabledChanged.on { enabled in
-      if (enabled) {
-        setupAudio()
-      } else {
-        stopSave {}
+      Console.log("enabledChanged listener", "enabled=\(enabled)")
+      DispatchQueue.main.async {
+        if engine == nil || output == nil {
+          setupAudio {
+            applyProcessingEnabledState(enabled)
+            audioTransitionInFlight = false
+            audioTransitionCompleted.emit(enabled)
+          }
+        } else {
+          applyProcessingEnabledState(enabled)
+          audioTransitionInFlight = false
+          audioTransitionCompleted.emit(enabled)
+        }
       }
     }
     
@@ -119,7 +155,7 @@ class Application {
   }
   
   private static var settingUpAudio = false
-  private static func setupAudio () {
+  private static func setupAudio (_ completion: (() -> Void)? = nil) {
     if (settingUpAudio) { return }
     settingUpAudio = true
     Console.log("Setting up Audio Engine")
@@ -127,6 +163,8 @@ class Application {
       setupDeviceEvents()
       startPassthrough {
         settingUpAudio = false
+        applyProcessingEnabledState(enabled)
+        completion?()
       }
     }
   }
@@ -139,7 +177,7 @@ class Application {
 
       if Outputs.isDeviceAllowed(device) {
         if ignoreEvents {
-          dataBus.send(to: "/outputs/selected", data: JSON([ "id": device.id ]))
+          dataBus?.send(to: "/outputs/selected", data: JSON([ "id": device.id ]))
           return
         }
         Console.log("outputChanged: ", device, " starting PlayThrough")
@@ -259,6 +297,7 @@ class Application {
     }
 
     lastKnownDeviceStack.append(selectedDevice!)
+    stabilizeInputDeviceForSelectedOutput()
 
     ignoreEvents = true
     var volume: Double = Application.store.state.volume.gain
@@ -303,18 +342,70 @@ class Application {
     }
   }
 
-  private static func waitForDriverActivation (timeoutMs: UInt = 1000, pollMs: UInt = 50, completion: @escaping () -> Void) {
-    let startedAt = Time.stamp
+  private static func waitForDriverActivation (timeoutMs: UInt = 3000, pollMs: UInt = 50, completion: @escaping () -> Void) {
+    var startedAt = Time.stamp
+    var didRetryWithDriverReset = false
 
     func finishIfReady () {
-      if AudioDevice.currentOutputDevice.id == Driver.device!.id {
+      let currentOutputDevice = AudioDevice.defaultOutputDevice()
+      let currentOutputId = currentOutputDevice?.id
+      let driverId = Driver.device?.id
+
+      if currentOutputId == driverId, Driver.hidden == false {
+        Console.log(
+          "waitForDriverActivation ready",
+          "currentOutputId=\(String(describing: currentOutputId))",
+          "driverId=\(String(describing: driverId))",
+          "hidden=\(Driver.hidden)"
+        )
         completion()
         return
       }
 
       if Time.stamp - startedAt >= timeoutMs {
+        if !didRetryWithDriverReset {
+          didRetryWithDriverReset = true
+          startedAt = Time.stamp
+          Console.log(
+            "waitForDriverActivation resetting driver",
+            "currentOutputId=\(String(describing: currentOutputId))",
+            "driverId=\(String(describing: driverId))",
+            "hidden=\(Driver.hidden)"
+          )
+
+          if Driver.hidden == false {
+            Driver.shown = false
+          }
+
+          Async.delay(200) {
+            Driver.show {
+              if let driverDevice = Driver.device {
+                AudioDevice.currentOutputDevice = driverDevice
+                AudioDevice.currentSystemDevice = driverDevice
+              }
+              finishIfReady()
+            }
+          }
+          return
+        }
+
+        Console.log(
+          "waitForDriverActivation timeout",
+          "currentOutputId=\(String(describing: currentOutputId))",
+          "driverId=\(String(describing: driverId))",
+          "hidden=\(Driver.hidden)"
+        )
         completion()
         return
+      }
+
+      if Driver.hidden {
+        Driver.shown = true
+      }
+
+      if let driverDevice = Driver.device {
+        AudioDevice.currentOutputDevice = driverDevice
+        AudioDevice.currentSystemDevice = driverDevice
       }
 
       Async.delay(pollMs) {
@@ -344,6 +435,53 @@ class Application {
     }
 
     return newDevice
+  }
+
+  private static func stabilizeInputDeviceForSelectedOutput () {
+    guard
+      let selectedOutput = selectedDevice,
+      let currentInput = AudioDevice.defaultInputDevice()
+    else {
+      return
+    }
+
+    if currentInput.id == Driver.device!.id {
+      return
+    }
+
+    lastKnownInputDevice = currentInput
+    Storage[.lastKnownInputDeviceId] = Int(currentInput.id)
+
+    let inputPrefix = currentInput.uid?.split(separator: ":").first
+    let outputPrefix = selectedOutput.uid?.split(separator: ":").first
+    let sharedBluetoothEndpoint = inputPrefix != nil && inputPrefix == outputPrefix
+    let sameNamedHeadset = currentInput.name == selectedOutput.name
+
+    if sharedBluetoothEndpoint || sameNamedHeadset {
+      let fallbackInput = AudioDevice.builtInInputDevice
+      if fallbackInput.id != currentInput.id {
+        AudioDevice.currentInputDevice = fallbackInput
+      }
+    }
+  }
+
+  private static func restoreLastKnownInputDevice () {
+    guard let previousInput = lastKnownInputDevice else {
+      return
+    }
+
+    guard previousInput.id != Driver.device!.id else {
+      lastKnownInputDevice = nil
+      return
+    }
+
+    if let matchingInput = AudioDevice.allInputDevices().first(where: {
+      $0.id == previousInput.id || $0.uid == previousInput.uid || $0.name == previousInput.name
+    }) {
+      AudioDevice.currentInputDevice = matchingInput
+    }
+
+    lastKnownInputDevice = nil
   }
 
   private static func matchDriverSampleRateToOutput () {
@@ -532,19 +670,13 @@ class Application {
     Driver.name = ""
     AudioDevice.currentOutputDevice = device
     AudioDevice.currentSystemDevice = device
+    restoreLastKnownInputDevice()
   }
 
   static func stopEngines (_ completion: @escaping () -> Void) {
     DispatchQueue.main.async {
-      var returned = false
-      Async.delay(2000) {
-        if (!returned) {
-          completion()
-        }
-      }
       output?.stop()
       engine?.stop()
-      returned = true
       completion()
     }
   }
@@ -555,17 +687,19 @@ class Application {
   }
 
   static func stopRemoveEngines (_ completion: @escaping () -> Void) {
-//    stopEngines {
+    stopEngines {
       removeEngines()
       completion()
-//    }
+    }
   }
 
   static func stopSave (_ completion: @escaping () -> Void) {
+    Console.log("stopSave begin")
     Storage.synchronize()
     stopListeners()
     stopRemoveEngines {
       switchBackToLastKnownDevice()
+      Console.log("stopSave complete")
       completion()
     }
   }
@@ -612,8 +746,10 @@ class Application {
   }
   
   static func handleTermination (_ completion: (() -> Void)? = nil) {
+    Console.log("handleTermination begin")
     stopSave {
       Driver.hidden = true
+      Console.log("handleTermination complete")
       if completion != nil {
         completion!()
       }
@@ -673,6 +809,9 @@ class Application {
   
   static func newState (_ state: ApplicationState) {
     if state.enabled != enabled {
+      Console.log("Application.newState enabled changed", "old=\(enabled)", "new=\(state.enabled)")
+    }
+    if state.enabled != enabled {
       enabled = state.enabled
     }
 
@@ -699,9 +838,14 @@ class Application {
   static private let dispatchActionQueue = DispatchQueue(label: "dispatchActionQueue", qos: .userInitiated)
   // Custom dispatch function. Need to execute some dispatches on the main thread
   static func dispatchAction(_ action: Action, onMainThread: Bool = true) {
+    Console.log("dispatchAction", "\(type(of: action))", "onMainThread=\(onMainThread)")
     if (onMainThread) {
-      DispatchQueue.main.async {
+      if Thread.isMainThread {
         store.dispatch(action)
+      } else {
+        DispatchQueue.main.async {
+          store.dispatch(action)
+        }
       }
     } else {
       dispatchActionQueue.async {

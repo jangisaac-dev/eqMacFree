@@ -70,12 +70,6 @@ func EQM_Initialize (inDriver: AudioServerPlugInDriverRef, inHost: AudioServerPl
   EQMDriver.host = inHost
 
   EQMDriver.calculateHostTicksPerFrame()
-
-  DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
-    if (!EQMClients.isAppClientPresent) {
-      EQMDevice.shown = false
-    }
-  }
   
   // log("EQM_Initialize() - Host: \(String(describing: EQMDriver.host)) | hostTicksPerFrame = \(String(describing: EQMDriver.hostTicksPerFrame))")
 
@@ -114,7 +108,12 @@ func EQM_AddDeviceClient (inDriver: AudioServerPlugInDriverRef, inDeviceObjectID
   // successfully.
   guard EQMDriver.validateDriver(inDriver) else { return kAudioHardwareBadObjectError }
 
-  EQMClients.add(EQMClient(from: inClientInfo.pointee))
+  let client = EQMClient(from: inClientInfo.pointee)
+  EQMClients.add(client)
+
+  if client.isAppClient || EQMClients.isAppClientPresent {
+    EQMDevice.shown = true
+  }
 
   return noErr
 }

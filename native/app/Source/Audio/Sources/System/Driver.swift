@@ -14,30 +14,103 @@ import EmitterKit
 import Shared
 
 class Driver {
+  private static func parseInstalledVersion(_ rawVersion: String) -> Version {
+    if let semanticVersion = Version(tolerant: rawVersion), rawVersion.contains(".") {
+      return semanticVersion
+    }
+
+    if let buildNumber = Int(rawVersion), buildNumber >= 10000 {
+      let major = buildNumber / 10000
+      let minor = (buildNumber / 100) % 100
+      let patch = buildNumber % 100
+      return Version(major, minor, patch)
+    }
+
+    return Version(tolerant: rawVersion) ?? .null
+  }
+
   static func check (_ completion: @escaping() -> Void) {
-    if !Driver.isInstalled || !Driver.isCompatible {
-      let isIncompatable = Driver.isInstalled && !Driver.isCompatible
-      let message = isIncompatable ?
-        "The installed eqMacFree audio driver is incompatible with this app build. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
-        : "The eqMacFree audio driver is not installed. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
-      let title = isIncompatable ? "The eqMacFree audio driver is incompatible" : "The eqMacFree audio driver is not installed"
-      Alert.withButtons(
-        title: title,
-        message: message,
-        buttons: ["Restart Mac", "Open eqMacFree repo", "Quit"]
-      ) { buttonPressed in
-        switch NSApplication.ModalResponse(buttonPressed) {
-          case .alertFirstButtonReturn:
-            Application.restartMac()
-            break
-          case .alertSecondButtonReturn:
-            NSWorkspace.shared.open(Constants.WEBSITE_URL)
-          default: break
-        }
-        return Application.quit()
+    prepareForUse { ready in
+      if ready {
+        completion()
+      } else {
+        presentFailure()
       }
+    }
+  }
+
+  private static func prepareForUse (_ completion: @escaping (Bool) -> Void) {
+    guard isInstalled else {
+      return completion(false)
+    }
+
+    if let device = self.device, device.isAlive() {
+      if hidden {
+        return show {
+          completion(self.isCompatible)
+        }
+      }
+      return completion(isCompatible)
+    }
+
+    if pluginId != nil {
+      waitForDeviceAppearance {
+        guard let device = self.device, device.isAlive() else {
+          return completion(false)
+        }
+        if self.hidden {
+          self.show {
+            completion(self.isCompatible)
+          }
+        } else {
+          completion(self.isCompatible)
+        }
+      }
+      return
+    }
+
+    completion(false)
+  }
+
+  private static func waitForDeviceAppearance (attempt: Int = 0, maxAttempts: Int = 10, completion: @escaping () -> Void) {
+    if self.device != nil || attempt >= maxAttempts {
+      return completion()
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
+      waitForDeviceAppearance(attempt: attempt + 1, maxAttempts: maxAttempts, completion: completion)
+    }
+  }
+
+  private static func presentFailure () {
+    let title: String
+    let message: String
+
+    if Driver.isInstalledButUnavailable {
+      title = "The eqMacFree audio driver failed to activate"
+      message = "The eqMacFree audio driver is installed, but macOS did not activate it. This usually means the driver bundle is blocked by system trust policy or did not load correctly. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
+    } else if Driver.isInstalled {
+      title = "The eqMacFree audio driver is incompatible"
+      message = "The installed eqMacFree audio driver is incompatible with this app build. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
     } else {
-      completion()
+      title = "The eqMacFree audio driver is not installed"
+      message = "The eqMacFree audio driver is not installed. Restart your Mac and launch eqMacFree again. If that does not help, reinstall eqMacFree from the public repository."
+    }
+
+    Alert.withButtons(
+      title: title,
+      message: message,
+      buttons: ["Restart Mac", "Open eqMacFree repo", "Quit"]
+    ) { buttonPressed in
+      switch NSApplication.ModalResponse(buttonPressed) {
+        case .alertFirstButtonReturn:
+          Application.restartMac()
+          break
+        case .alertSecondButtonReturn:
+          NSWorkspace.shared.open(Constants.WEBSITE_URL)
+        default: break
+      }
+      return Application.quit()
     }
   }
 
@@ -90,6 +163,10 @@ class Driver {
     get {
       return self.device != nil || self.pluginId != nil
     }
+  }
+
+  static var isInstalledButUnavailable: Bool {
+    return self.pluginId != nil && self.device == nil
   }
 
   static var name: String {
@@ -147,14 +224,15 @@ class Driver {
     var size: UInt32 = UInt32(MemoryLayout<CFString>.size)
     
     var version: CFString? = nil
-    
+
     checkErr(AudioObjectGetPropertyData(Driver.device!.id, &EQMDeviceCustom.addresses.version, 0, nil, &size, &version))
 
     let verStr = version as String?
-    return verStr != nil ? (Version(tolerant: verStr!) ?? .null) : .null
+    return verStr != nil ? parseInstalledVersion(verStr!) : .null
   }
   
   static var isCompatible: Bool {
+    if isInstalledButUnavailable { return false }
     let compatibleRange = Constants.DRIVER_MINIMUM_VERSION ..< Version(2, 0, 0)
     return compatibleRange.contains(installedVersion)
   }

@@ -40,7 +40,17 @@ class Sources {
   }
 
   static func getInputPermission (_ callback: @escaping () -> Void) {
+    struct PermissionPromptState {
+      static var isPromptInFlight = false
+    }
+
+    Console.log("getInputPermission", "hasPermission=\(InputSource.hasPermission)")
     if !InputSource.hasPermission {
+      if PermissionPromptState.isPromptInFlight {
+        Console.log("getInputPermission skipped duplicate prompt")
+        return
+      }
+      PermissionPromptState.isPromptInFlight = true
       UI.show()
       let title = "Microphone Usage Permission"
       Alert.confirm(
@@ -50,6 +60,7 @@ class Sources {
         cancelText: "No, quit eqMac") { proceed in
           if proceed {
             InputSource.requestPermission() { allowed in
+              Console.log("requestPermission callback", "allowed=\(allowed)", "hasPermission=\(InputSource.hasPermission)")
               if !InputSource.hasPermission {
                 NSWorkspace.shared.open(URL(string:"x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!)
                 Async.delay(1000) {
@@ -59,6 +70,7 @@ class Sources {
                     message: "You have not allowed access to your Microphone. \neqMac needs access to Microphone to Route and Process System Audio. \neqMac will try to open your Security & Privacy settings. \n\n If it didn't open please follow these steps, otherwise skip to step 5: \n\n1. Open your \"System Preferences.app\" \n2. Click on \"Security & Privacy\" \n3. Click on \"Privacy\" tab \n4. Scroll down to \"Microphone\" section \n5. Check the box against \"eqMac.app\" \n\nAfter that we will need to restart the Application",
                     okText: "Ok I did that. Restart eqMac",
                     cancelText: "No, quit eqMac") { restart in
+                      PermissionPromptState.isPromptInFlight = false
                       if restart {
                         Application.restart()
                       } else {
@@ -67,10 +79,12 @@ class Sources {
                   }
                 }
               } else {
+                PermissionPromptState.isPromptInFlight = false
                 callback()
               }
             }
           } else {
+            PermissionPromptState.isPromptInFlight = false
             Application.quit()
           }
       }

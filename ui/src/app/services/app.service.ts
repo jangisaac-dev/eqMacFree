@@ -100,9 +100,9 @@ export class ApplicationService extends DataService {
     return enabled
   }
 
-  setEnabled (enabled: boolean) {
-    this.enabled = enabled
-    return this.request({ method: 'POST', endpoint: '/enabled', data: { enabled } })
+  async setEnabled (enabled: boolean) {
+    await this.request({ method: 'POST', endpoint: '/enabled', data: { enabled } })
+    return await this.getEnabled()
   }
 
   async getBundleIcon (bundleId: string): Promise<string> {

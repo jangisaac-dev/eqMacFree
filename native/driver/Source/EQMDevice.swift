@@ -21,6 +21,16 @@ class EQMDevice: EQMObject {
         EQMDriver.propertiesUpdated(
           objectId: kObjectID_Device,
           changedProperties: [
+            AudioObjectPropertyAddress(
+              mSelector: kAudioDevicePropertyIsHidden,
+              mScope: kAudioObjectPropertyScopeGlobal,
+              mElement: kAudioObjectPropertyElementMaster
+            ),
+            AudioObjectPropertyAddress(
+              mSelector: EQMDeviceCustom.properties.shown,
+              mScope: kAudioObjectPropertyScopeGlobal,
+              mElement: kAudioObjectPropertyElementMaster
+            ),
           ]
         )
       }
@@ -32,6 +42,14 @@ class EQMDevice: EQMObject {
   static var anchorSampleTime: UInt64 = 0
   static var timestampCount: UInt64 = 0
   static let ioMutex = Mutex()
+
+  private static func canAcceptAppWrite(from client: EQMClient?) -> Bool {
+    if client?.bundleId == APP_BUNDLE_ID {
+      return true
+    }
+
+    return EQMClients.isAppClientPresent
+  }
 
   static let ringBufferSize: UInt32 = 16384
   static var ringBuffer: UnsafeMutablePointer<Float32>?
@@ -445,7 +463,7 @@ class EQMDevice: EQMObject {
     // Custom Properties
     case EQMDeviceCustom.properties.shown:
       // Only allow eqMac app to set this property
-      guard client?.bundleId == APP_BUNDLE_ID else { return noErr }
+      guard canAcceptAppWrite(from: client) else { return noErr }
 
       let shownRef = data.load(as: CFBoolean.self)
       let newShown = CFBooleanGetValue(shownRef)
@@ -458,7 +476,7 @@ class EQMDevice: EQMObject {
 
     case EQMDeviceCustom.properties.latency:
       // Only allow eqMac app to set this property
-      guard client?.bundleId == APP_BUNDLE_ID else { return noErr }
+      guard canAcceptAppWrite(from: client) else { return noErr }
 
       let newLatencyRef = data.load(as: CFNumber.self)
       var newLatency: Int32 = 0
@@ -478,7 +496,7 @@ class EQMDevice: EQMObject {
       return noErr
     case EQMDeviceCustom.properties.name:
       // Only allow eqMac app to set this property
-      guard client?.bundleId == APP_BUNDLE_ID else { return noErr }
+      guard canAcceptAppWrite(from: client) else { return noErr }
 
       var newName = data.load(as: CFString.self) as String
 

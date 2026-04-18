@@ -32,6 +32,7 @@ let AllEqualizerTypes = [
 
 class Equalizers: Effect, StoreSubscriber {
   // MARK: - Events
+  static let enabledChanged = Event<Bool>()
   static let typeChanged = Event<EqualizerType>()
   
   // MARK: - Properties
@@ -92,7 +93,9 @@ class Equalizers: Effect, StoreSubscriber {
   }
 
   override func enabledDidSet() {
+    Console.log("Equalizers.enabledDidSet", "enabled=\(enabled)")
     active?.enabled = enabled
+    Equalizers.enabledChanged.emit(enabled)
   }
 
   deinit {

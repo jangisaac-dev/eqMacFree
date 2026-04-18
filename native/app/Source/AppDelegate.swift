@@ -21,6 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
   var willBeDownloadingUpdate = false
   
   func applicationDidFinishLaunching(_ aNotification: Notification) {
+    Console.log("applicationDidFinishLaunching")
     for window in NSApplication.shared.windows {
       window.close()
     }
@@ -63,6 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
   }
   
   func applicationWillTerminate(_ aNotification: Notification) {
+    Console.log("applicationWillTerminate")
     Application.handleTermination()
   }
   
@@ -82,6 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
   }
 
   func applicationDidResignActive(_ notification: Notification) {
+    Console.log("applicationDidResignActive")
     if UI.mode == .popover {
       UI.close()
     }
@@ -131,4 +134,3 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
     Application.handleWakeUp()
   }
 }
-

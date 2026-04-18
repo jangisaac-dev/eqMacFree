@@ -124,8 +124,16 @@ export class EqualizersComponent implements OnInit, OnDestroy {
     this.service.offTypeChanged(this.onTypeChangedEventCallback)
   }
 
-  setEnabled () {
-    this.service.setEnabled(this.enabled)
+  async setEnabled (enabled: boolean) {
+    if (this.enabled === enabled) return
+
+    this.enabled = enabled
+
+    try {
+      await this.service.setEnabled(enabled)
+    } catch {
+      this.enabled = await this.service.getEnabled()
+    }
   }
 
   async setType (type: EqualizerType) {
