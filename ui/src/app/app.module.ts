@@ -63,6 +63,7 @@ import {
 import {
   VolumeBoosterBalanceComponent
 } from './sections/volume/booster-balance/volume-booster-balance.component'
+import { SpatialAudioComponent } from './sections/spatial-audio/spatial-audio.component'
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { SettingsComponent } from './sections/settings/settings.component'
@@ -109,6 +110,7 @@ import { UIService } from './services/ui.service'
     BasicEqualizerComponent,
     AdvancedEqualizerComponent,
     VolumeBoosterBalanceComponent,
+    SpatialAudioComponent,
     SettingsComponent,
     OptionsComponent,
     HelpComponent,

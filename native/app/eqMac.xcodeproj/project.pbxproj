@@ -550,7 +550,7 @@
 			buildConfigurationList = E086B00A1FCCB8E700CF9F0D /* Build configuration list for PBXNativeTarget "eqMac" */;
 			buildPhases = (
 				AFDFF826F547656CFBBD1F8A /* [CP] Check Pods Manifest.lock */,
-				E057A635226F9F710019D13C /* Run Script - Kill eqMac (DEBUG) */,
+				E057A635226F9F710019D13C /* Run Script - Kill eqMacFree (DEBUG) */,
 				E00C596723BBBF7500C7B8B6 /* Headers */,
 				E086AFF81FCCB8E700CF9F0D /* Sources */,
 				E086AFFA1FCCB8E700CF9F0D /* Resources */,
@@ -559,7 +559,7 @@
 				896A6D438DAEE15F87C748E4 /* [CP] Embed Pods Frameworks */,
 				E0A48D6223C6028F00700C39 /* Run Script - Hardruntime + Sign Sparkle */,
 				E0A48D6323C61CC200700C39 /* Run Script - Hardruntime + Sign LaunchAtLogin */,
-				E06B9AEA2459CAFE00A4D10B /* Run Script - Upload dSYM to Sentry */,
+				E06B9AEA2459CAFE00A4D10B /* Run Script - Skip legacy Sentry upload */,
 			);
 			buildRules = (
 			);
@@ -698,7 +698,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E057A635226F9F710019D13C /* Run Script - Kill eqMac (DEBUG) */ = {
+		E057A635226F9F710019D13C /* Run Script - Kill eqMacFree (DEBUG) */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -712,7 +712,7 @@
 			shellPath = /bin/zsh;
 			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\n    pkill -f eqMacFree.app || true\nfi\n";
 		};
-		E06B9AEA2459CAFE00A4D10B /* Run Script - Upload dSYM to Sentry */ = {
+		E06B9AEA2459CAFE00A4D10B /* Run Script - Skip legacy Sentry upload */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (

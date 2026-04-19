@@ -7,7 +7,7 @@
 //
 
 #import "EQMDriverBridge.h"
-#import "eqMac-Swift.h"
+#import "eqMacFree-Swift.h"
 
 void *EQM_Create(CFAllocatorRef allocator, CFUUIDRef requestedTypeUUID) {
   return [EQMDriver createWithAllocator:allocator requestedTypeUUID:requestedTypeUUID];

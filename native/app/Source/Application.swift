@@ -311,7 +311,7 @@ class Application {
     
     Driver.device!.setVirtualMasterVolume(volume > 1 ? 1 : Float32(volume), direction: .playback)
     Driver.latency = selectedDevice!.latency(direction: .playback) ?? 0 // Set driver latency to mimic device
-    Driver.name = "\(selectedDevice!.sourceName ?? selectedDevice!.name) (eqMac)"
+    Driver.name = "\(selectedDevice!.sourceName ?? selectedDevice!.name) (eqMacFree)"
     self.matchDriverSampleRateToOutput()
     
     Console.log("Driver new Latency: \(Driver.latency)")
@@ -408,6 +408,26 @@ class Application {
       }
     }
     audioPipelineIsRunning.emit()
+  }
+
+  static func rebuildAudioPipeline () {
+    guard enabled, selectedDevice != nil else { return }
+
+    Console.log("Rebuilding audio pipeline")
+    ignoreEvents = true
+    stopRemoveEngines {
+      matchDriverSampleRateToOutput()
+      createAudioPipeline()
+      ignoreEvents = false
+    }
+  }
+
+  static func updateSpatialAudioState () {
+    guard enabled, output != nil else { return }
+    output?.updateSpatialAudioState(
+      enabled: store.state.settings.spatialAudioEnabled,
+      preset: store.state.settings.spatialAudioPreset
+    )
   }
   
   private static func setupUI (_ completion: @escaping () -> Void) {

@@ -1,5 +1,5 @@
 PODS:
-  - AMCoreAudio (3.5)
+  - AMCoreAudio (3.4)
   - EmitterKit (5.2.2)
   - KeychainSwift (13.0.0)
   - ReSwift (6.1.0)
@@ -16,7 +16,7 @@ PODS:
   - Zip (2.1.1)
 
 DEPENDENCIES:
-  - AMCoreAudio (from `https://github.com/bitgapp/AMCoreAudio.git`, commit `b312d1509ef863dea3ca56cfa3f57451de4ff721`)
+  - AMCoreAudio (from `AMCoreAudio-fixed.podspec`)
   - EmitterKit (~> 5.2.2)
   - KeychainSwift (~> 13.0)
   - ReSwift (~> 6.1)
@@ -45,8 +45,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   AMCoreAudio:
-    :commit: b312d1509ef863dea3ca56cfa3f57451de4ff721
-    :git: https://github.com/bitgapp/AMCoreAudio.git
+    :podspec: AMCoreAudio-fixed.podspec
   STPrivilegedTask:
     :commit: fdca677c77adb166a2be4c5ea9c7580a738c49c9
     :git: https://github.com/sveinbjornt/STPrivilegedTask.git
@@ -54,9 +53,6 @@ EXTERNAL SOURCES:
     :git: https://github.com/bitgapp/Zip.git
 
 CHECKOUT OPTIONS:
-  AMCoreAudio:
-    :commit: b312d1509ef863dea3ca56cfa3f57451de4ff721
-    :git: https://github.com/bitgapp/AMCoreAudio.git
   STPrivilegedTask:
     :commit: fdca677c77adb166a2be4c5ea9c7580a738c49c9
     :git: https://github.com/sveinbjornt/STPrivilegedTask.git
@@ -65,7 +61,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/bitgapp/Zip.git
 
 SPEC CHECKSUMS:
-  AMCoreAudio: d7fc6672b56df2ade8e77d08f3247d18d59697e3
+  AMCoreAudio: ca11fe7f38c08d2c869a8d4aff238d409679dcdf
   EmitterKit: e7a27b37118823d8ad413b8396f75e40d59f8cba
   KeychainSwift: 23d6c16cbc33f20fafa30c3d783241b4b87d998c
   ReSwift: eab3c01e4279ba81b54a61e4fd6499634d20123a
@@ -79,6 +75,6 @@ SPEC CHECKSUMS:
   WebViewJavascriptBridge: 7f5bc4d3581e672e8f32bd0f812d54bc69bb8e29
   Zip: 414f59909701fda9a84ab774ebe0f5449b1082cc
 
-PODFILE CHECKSUM: 80a9c25477279d138986fe22fa3da41f77c4e379
+PODFILE CHECKSUM: cb2bd36d6f5989315ea1ec1392cd83b5fc0ee64a
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.16.2

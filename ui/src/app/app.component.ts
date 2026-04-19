@@ -18,6 +18,7 @@ import { OptionsDialogComponent } from './components/options-dialog/options-dial
 import { Option, Options } from './components/options/options.component'
 import { HeaderComponent } from './sections/header/header.component'
 import { VolumeBoosterBalanceComponent } from './sections/volume/booster-balance/volume-booster-balance.component'
+import { SpatialAudioComponent } from './sections/spatial-audio/spatial-audio.component'
 import { EqualizersComponent } from './sections/effects/equalizers/equalizers.component'
 import { OutputsComponent } from './sections/outputs/outputs.component'
 
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit, AfterContentInit {
   @ViewChild('container', { static: true }) container
   @ViewChild('header', { static: true }) header: HeaderComponent
   @ViewChild('volumeBoosterBalance', { static: false }) volumeBoosterBalance: VolumeBoosterBalanceComponent
+  @ViewChild('spatialAudio', { static: false }) spatialAudio: SpatialAudioComponent
   @ViewChild('equalizers', { static: false }) equalizers: EqualizersComponent
   @ViewChild('outputs', { static: false }) outputs: OutputsComponent
 
@@ -83,6 +85,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     } = this.ui.settings
     let minHeight = this.header.height + divider +
       ((volumeFeatureEnabled || balanceFeatureEnabled) ? (this.volumeBoosterBalance.height + divider) : 0) +
+      (this.spatialAudio ? (this.spatialAudio.height + divider) : 0) +
       (equalizersFeatureEnabled ? (this.equalizers.height + divider) : 0) +
       (outputFeatureEnabled ? this.outputs.height : 0)
 
@@ -111,6 +114,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     } = this.ui.settings
     let maxHeight = this.header.height + divider +
       ((volumeFeatureEnabled || balanceFeatureEnabled) ? (this.volumeBoosterBalance.height + divider) : 0) +
+      (this.spatialAudio ? (this.spatialAudio.maxHeight + divider) : 0) +
       (equalizersFeatureEnabled ? (this.equalizers.maxHeight + divider) : 0) +
       (outputFeatureEnabled ? this.outputs.height : 0)
 

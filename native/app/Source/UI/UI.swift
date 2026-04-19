@@ -110,11 +110,11 @@ class UI: StoreSubscriber {
     if fs.fileExists(atPath: remoteZipPath.path) {
       try! Zip.unzipFile(remoteZipPath, destination: localPath, overwrite: true, password: nil) // Unzip
     } else {
-      if !fs.fileExists(atPath: localZipPath.path) {
-        Console.log("\(localZipPath.path) doesnt exist")
-        let bundleUIZipPath = Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Embedded")!
-        try! fs.copyItem(at: bundleUIZipPath, to: localZipPath)
+      let bundleUIZipPath = Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Assets/Embedded")!
+      if fs.fileExists(atPath: localZipPath.path) {
+        try? fs.removeItem(at: localZipPath)
       }
+      try! fs.copyItem(at: bundleUIZipPath, to: localZipPath)
       try! Zip.unzipFile(localZipPath, destination: localPath, overwrite: true, password: nil) // Unzip
     }
   }

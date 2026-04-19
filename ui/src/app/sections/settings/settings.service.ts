@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { DataService } from 'src/app/services/data.service'
+import { SpatialAudioPreset } from '../spatial-audio/spatial-audio.service'
 
 export enum IconMode {
   both = 'both',
@@ -66,5 +67,23 @@ export class SettingsService extends DataService {
 
   setDoBetaUpdates ({ doBetaUpdates }: { doBetaUpdates: boolean }) {
     return this.request({ method: 'POST', endpoint: '/beta-updates', data: { doBetaUpdates } })
+  }
+
+  async getSpatialAudioEnabled (): Promise<boolean> {
+    const { spatialAudioEnabled } = await this.request({ method: 'GET', endpoint: '/spatial-audio-enabled' })
+    return spatialAudioEnabled
+  }
+
+  setSpatialAudioEnabled ({ spatialAudioEnabled }: { spatialAudioEnabled: boolean }) {
+    return this.request({ method: 'POST', endpoint: '/spatial-audio-enabled', data: { spatialAudioEnabled } })
+  }
+
+  async getSpatialAudioPreset (): Promise<SpatialAudioPreset> {
+    const { spatialAudioPreset } = await this.request({ method: 'GET', endpoint: '/spatial-audio-preset' })
+    return spatialAudioPreset
+  }
+
+  setSpatialAudioPreset ({ spatialAudioPreset }: { spatialAudioPreset: SpatialAudioPreset }) {
+    return this.request({ method: 'POST', endpoint: '/spatial-audio-preset', data: { spatialAudioPreset } })
   }
 }

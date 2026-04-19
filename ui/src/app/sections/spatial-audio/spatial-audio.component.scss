@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.toolbar,
+.presets {
+  padding: 10px;
+}
+
+.summary {
+  cursor: pointer;
+}
+
+.summary.disabled {
+  cursor: default;
+  opacity: 0.4;
+}

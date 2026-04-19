@@ -101,6 +101,39 @@ class SettingsDataBus: DataBus {
 
       return "Beta updates option has been set"
     }
+
+    self.on(.GET, "/spatial-audio-enabled") { data, _ in
+      return [ "spatialAudioEnabled": self.state.spatialAudioEnabled ]
+    }
+
+    self.on(.POST, "/spatial-audio-enabled") { data, _ in
+      let spatialAudioEnabled = data["spatialAudioEnabled"] as? Bool
+      if spatialAudioEnabled == nil {
+        throw "Invalid 'spatialAudioEnabled' parameter, must be a Boolean"
+      }
+
+      Application.dispatchAction(SettingsAction.setSpatialAudioEnabled(spatialAudioEnabled!))
+
+      return "Spatial Audio option has been set"
+    }
+
+    self.on(.GET, "/spatial-audio-preset") { data, _ in
+      return [ "spatialAudioPreset": self.state.spatialAudioPreset.rawValue ]
+    }
+
+    self.on(.POST, "/spatial-audio-preset") { data, _ in
+      let presetRaw = data["spatialAudioPreset"] as? String
+      guard
+        let presetRaw = presetRaw,
+        let preset = SpatialAudioPreset(rawValue: presetRaw)
+      else {
+        throw "Invalid 'spatialAudioPreset' parameter, must be one of: cinema, music, voice, studio, live, gaming"
+      }
+
+      Application.dispatchAction(SettingsAction.setSpatialAudioPreset(preset))
+
+      return "Spatial Audio preset has been set"
+    }
     
   }
 }

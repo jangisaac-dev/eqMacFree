@@ -5,6 +5,8 @@ import CoreFoundation
 import EmitterKit
 
 extension AudioDevice {
+  static var register = false
+
   func canBeDefaultDevice (direction: AMCoreAudio.Direction) -> Bool {
     var address = AudioObjectPropertyAddress(
       mSelector: kAudioDevicePropertyDeviceCanBeDefaultDevice,
@@ -249,4 +251,3 @@ extension AudioDevice {
       return AudioObjectGetPropertyDataSize(objectID, &theAddress, 0, nil, &size)
   }
 }
-

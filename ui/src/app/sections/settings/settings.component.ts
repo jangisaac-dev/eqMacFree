@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core'
 import { CheckboxOption, ButtonOption, Options, SelectOption, DividerOption, FlatSliderOption, LabelOption, ValueScreenOption } from 'src/app/components/options/options.component'
 import { SettingsService, IconMode } from './settings.service'
 import { ApplicationService } from '../../services/app.service'
@@ -9,13 +9,15 @@ import { AnalyticsService } from '../../services/analytics.service'
 import { SemanticVersion } from '../../services/semantic-version.service'
 import { OptionsDialogComponent } from '../../components/options-dialog/options-dialog.component'
 import { KnobControlStyle } from '../../../../../modules/components/src'
+import { SpatialAudioPreset, SpatialAudioService } from '../spatial-audio/spatial-audio.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'eqm-settings',
   templateUrl: './settings.component.html',
   styleUrls: [ './settings.component.scss' ]
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, OnDestroy {
   launchOnStartupOption: CheckboxOption = {
     type: 'checkbox',
     label: 'Launch on login',
@@ -180,6 +182,38 @@ This helps maintainers catch issues before broader public rollout.
     }
   }
 
+  spatialAudioOption: CheckboxOption = {
+    type: 'checkbox',
+    value: false,
+    label: 'Spatial Audio (Headphones)',
+    tooltip: `
+This is the first free public reimplementation slice of Spatial Audio in eqMacFree.
+Main testing entry point is the Spatial Audio card on the main screen.
+This Settings control mirrors the same experimental headphone-first state and does not claim full multichannel speaker parity.
+`,
+    toggled: spatialAudioEnabled => {
+      this.spatialAudio.setEnabled(spatialAudioEnabled)
+    }
+  }
+
+  spatialAudioPresetOption: SelectOption<SpatialAudioPreset> = {
+    type: 'select',
+    label: 'Spatial Audio Preset',
+    options: [
+      { id: 'music', label: 'Music (Balanced)' },
+      { id: 'cinema', label: 'Cinema (Wide)' },
+      { id: 'voice', label: 'Voice (Clear)' },
+      { id: 'studio', label: 'Studio (Subtle)' },
+      { id: 'live', label: 'Live (Airy)' },
+      { id: 'gaming', label: 'Gaming (Front)' }
+    ],
+    selectedId: 'music',
+    isEnabled: () => this.spatialAudioOption.value,
+    selected: spatialAudioPreset => {
+      this.spatialAudio.setPreset(spatialAudioPreset)
+    }
+  }
+
   statusItemIconTypeOption: SelectOption = {
     type: 'select',
     label: 'Status Icon Type',
@@ -314,6 +348,8 @@ This helps maintainers catch issues before broader public rollout.
     ],
     [ this.hideShowFeaturesOption ],
 
+    [ this.spatialAudioOption, this.spatialAudioPresetOption ],
+
     [ this.divider ],
 
     [ { type: 'label', label: 'Updates' } ],
@@ -346,12 +382,24 @@ This helps maintainers catch issues before broader public rollout.
     public dialog: MatDialog,
     public ui: UIService,
     public analytics: AnalyticsService,
+    public spatialAudio: SpatialAudioService,
     private readonly changeRef: ChangeDetectorRef
   ) {
   }
 
   ngOnInit () {
     this.sync()
+    this.setupEvents()
+  }
+
+  private spatialAudioStateChangedSubscription: Subscription
+
+  setupEvents () {
+    this.spatialAudioStateChangedSubscription = this.spatialAudio.stateChanged.subscribe(state => {
+      this.spatialAudioOption.value = state.enabled
+      this.spatialAudioPresetOption.selectedId = state.preset
+      this.changeRef.detectChanges()
+    })
   }
 
   async sync () {
@@ -361,29 +409,18 @@ This helps maintainers catch issues before broader public rollout.
   }
 
   async syncSettings () {
-    const [
-      launchOnStartup,
-      iconMode,
-      UISettings,
-      doCollectCrashReports,
-      doAutoCheckUpdates,
-      doOTAUpdates,
-      alwaytOnTop,
-      statusItemIconType,
-      doBetaUpdates,
-      uiScale
-    ] = await Promise.all([
-      this.settingsService.getLaunchOnStartup(),
-      this.settingsService.getIconMode(),
-      this.ui.getSettings(),
-      this.settingsService.getDoCollectCrashReports(),
-      this.settingsService.getDoAutoCheckUpdates(),
-      this.settingsService.getDoOTAUpdates(),
-      this.ui.getAlwaysOnTop(),
-      this.ui.getStatusItemIconType(),
-      this.settingsService.getDoBetaUpdates(),
-      this.ui.getScale()
-    ])
+    const launchOnStartup = await this.settingsService.getLaunchOnStartup()
+    const iconMode = await this.settingsService.getIconMode()
+    const UISettings = await this.ui.getSettings()
+    const doCollectCrashReports = await this.settingsService.getDoCollectCrashReports()
+    const doAutoCheckUpdates = await this.settingsService.getDoAutoCheckUpdates()
+    const doOTAUpdates = await this.settingsService.getDoOTAUpdates()
+    const alwaytOnTop = await this.ui.getAlwaysOnTop()
+    const statusItemIconType = await this.ui.getStatusItemIconType()
+    const doBetaUpdates = await this.settingsService.getDoBetaUpdates()
+    const uiScale = await this.ui.getScale()
+    const spatialAudioState = await this.spatialAudio.syncState()
+
     this.iconModeOption.selectedId = iconMode
     this.launchOnStartupOption.value = launchOnStartup
     this.replaceKnobsWithSlidersOption.value = UISettings.replaceKnobsWithSliders
@@ -396,6 +433,8 @@ This helps maintainers catch issues before broader public rollout.
     this.statusItemIconTypeOption.selectedId = statusItemIconType
     this.betaUpdatesOption.value = doBetaUpdates
     this.uiScaleSlider.value = uiScale
+    this.spatialAudioOption.value = spatialAudioState.enabled
+    this.spatialAudioPresetOption.selectedId = spatialAudioState.preset
     this.setUIScaleScreenValue()
   }
 
@@ -405,5 +444,9 @@ This helps maintainers catch issues before broader public rollout.
 
   async uninstall () {
     this.app.uninstall()
+  }
+
+  ngOnDestroy () {
+    this.spatialAudioStateChangedSubscription?.unsubscribe()
   }
 }

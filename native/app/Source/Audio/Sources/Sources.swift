@@ -45,9 +45,9 @@ class Sources {
       let title = "Microphone Usage Permission"
       Alert.confirm(
         title: title,
-        message: "eqMac needs access to Microphone to Route and Process System Audio. \nPlease click the \"Proceed\" button and allow access.",
+        message: "eqMacFree needs access to Microphone to Route and Process System Audio. \nPlease click the \"Proceed\" button and allow access.",
         okText: "Proceed",
-        cancelText: "No, quit eqMac") { proceed in
+        cancelText: "No, quit eqMacFree") { proceed in
           if proceed {
             InputSource.requestPermission() { allowed in
               if !InputSource.hasPermission {
@@ -56,9 +56,9 @@ class Sources {
                   
                   Alert.confirm(
                     title: "Microphone Usage Permission",
-                    message: "You have not allowed access to your Microphone. \neqMac needs access to Microphone to Route and Process System Audio. \neqMac will try to open your Security & Privacy settings. \n\n If it didn't open please follow these steps, otherwise skip to step 5: \n\n1. Open your \"System Preferences.app\" \n2. Click on \"Security & Privacy\" \n3. Click on \"Privacy\" tab \n4. Scroll down to \"Microphone\" section \n5. Check the box against \"eqMac.app\" \n\nAfter that we will need to restart the Application",
-                    okText: "Ok I did that. Restart eqMac",
-                    cancelText: "No, quit eqMac") { restart in
+                    message: "You have not allowed access to your Microphone. \neqMacFree needs access to Microphone to Route and Process System Audio. \neqMacFree will try to open your Security & Privacy settings. \n\n If it didn't open please follow these steps, otherwise skip to step 5: \n\n1. Open your \"System Preferences.app\" \n2. Click on \"Security & Privacy\" \n3. Click on \"Privacy\" tab \n4. Scroll down to \"Microphone\" section \n5. Check the box against \"eqMacFree.app\" \n\nAfter that we will need to restart the application",
+                    okText: "Ok I did that. Restart eqMacFree",
+                    cancelText: "No, quit eqMacFree") { restart in
                       if restart {
                         Application.restart()
                       } else {

@@ -1,4 +1,3 @@
-source 'https://github.com/AudioKit/Specs.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
 # Uncomment the next line to define a global platform for your project
@@ -11,6 +10,34 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.12'
     end
+  end
+
+  sentry_cpp_exception = File.join(installer.sandbox.root, 'Sentry', 'Sources', 'SentryCrash', 'Recording', 'Monitors', 'SentryCrashMonitor_CPPException.cpp')
+  if File.exist?(sentry_cpp_exception)
+    contents = File.read(sentry_cpp_exception)
+    unless contents.include?('#include <exception>')
+      contents.sub!('#include <dlfcn.h>', "#include <dlfcn.h>\n#include <exception>")
+      File.write(sentry_cpp_exception, contents)
+    end
+  end
+
+  sentry_machine_context = File.join(installer.sandbox.root, 'Sentry', 'Sources', 'SentryCrash', 'Recording', 'Tools', 'SentryCrashMachineContext.c')
+  if File.exist?(sentry_machine_context)
+    contents = File.read(sentry_machine_context)
+    unless contents.include?('#include <sys/_types/_ucontext64.h>')
+      contents.sub!('#include <mach/mach.h>', "#include <mach/mach.h>\n#include <sys/_types/_ucontext64.h>")
+      File.write(sentry_machine_context, contents)
+    end
+  end
+
+  amcoreaudio_source = File.join(installer.sandbox.root, 'AMCoreAudio', 'Source')
+  Dir.glob(File.join(amcoreaudio_source, '**', '*.swift')).each do |swift_file|
+    contents = File.read(swift_file)
+    updated = contents
+      .gsub('import CoreAudio.AudioHardwareBase', 'import CoreAudio')
+      .gsub('kAudioHardwareServiceDeviceProperty_VirtualMasterVolume', 'kAudioHardwareServiceDeviceProperty_VirtualMainVolume')
+      .gsub('kAudioHardwareServiceDeviceProperty_VirtualMasterBalance', 'kAudioHardwareServiceDeviceProperty_VirtualMainBalance')
+    File.write(swift_file, updated) if updated != contents
   end
 end
 
@@ -27,7 +54,7 @@ target 'eqMac' do
   project 'app/eqMac.xcodeproj'
 
   pod 'SwiftHTTP', '~> 3.0'
-  pod 'AMCoreAudio', :git => 'https://github.com/bitgapp/AMCoreAudio.git', :commit => 'b312d1509ef863dea3ca56cfa3f57451de4ff721'
+  pod 'AMCoreAudio', :podspec => 'AMCoreAudio-fixed.podspec'
   pod 'WebViewJavascriptBridge', '~> 6.0'
 #  pod 'ReachabilitySwift'
   pod 'ReSwift', '~> 6.1'
@@ -42,5 +69,3 @@ target 'eqMac' do
   shared_pods
 
 end
-
-

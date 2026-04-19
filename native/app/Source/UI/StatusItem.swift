@@ -115,7 +115,7 @@ class StatusItem {
     
     let quitMenuItem = NSMenuItem()
     quitMenuItem.target = self
-    quitMenuItem.title = "Quit eqMac"
+    quitMenuItem.title = "Quit eqMacFree"
     quitMenuItem.action = #selector(StatusItem.quit(sender:))
     quitMenuItem.isEnabled = true
     rightClickMenu.addItem(quitMenuItem)
@@ -152,4 +152,3 @@ class StatusItem {
     NotificationCenter.default.removeObserver(self)
   }
 }
-

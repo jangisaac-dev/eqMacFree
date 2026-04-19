@@ -12,12 +12,23 @@ import SwiftyUserDefaults
 import ReSwift
 import BetterCodable
 
+enum SpatialAudioPreset: String, Codable, CaseIterable {
+  case cinema = "cinema"
+  case music = "music"
+  case voice = "voice"
+  case studio = "studio"
+  case live = "live"
+  case gaming = "gaming"
+}
+
 struct SettingsState: State {
   var iconMode: IconMode = .both
   @DefaultFalse var doCollectCrashReports = false
   @DefaultFalse var doAutoCheckUpdates = false
   @DefaultFalse var doOTAUpdates = false
   @DefaultFalse var doBetaUpdates = false
+  @DefaultFalse var spatialAudioEnabled = false
+  var spatialAudioPreset: SpatialAudioPreset = .music
 }
 
 enum SettingsAction: Action {
@@ -26,6 +37,8 @@ enum SettingsAction: Action {
   case setDoAutoCheckUpdates(Bool)
   case setDoOTAUpdates(Bool)
   case setDoBetaUpdates(Bool)
+  case setSpatialAudioEnabled(Bool)
+  case setSpatialAudioPreset(SpatialAudioPreset)
 }
 
 func SettingsStateReducer(action: Action, state: SettingsState?) -> SettingsState {
@@ -41,6 +54,10 @@ func SettingsStateReducer(action: Action, state: SettingsState?) -> SettingsStat
     state.doOTAUpdates = doOTAUpdates
   case .setDoBetaUpdates(let doBetaUpdates)?:
     state.doBetaUpdates = doBetaUpdates
+  case .setSpatialAudioEnabled(let spatialAudioEnabled)?:
+    state.spatialAudioEnabled = spatialAudioEnabled
+  case .setSpatialAudioPreset(let spatialAudioPreset)?:
+    state.spatialAudioPreset = spatialAudioPreset
   case .none:
     break
   }

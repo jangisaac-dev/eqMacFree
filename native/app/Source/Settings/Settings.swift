@@ -63,6 +63,9 @@ class Settings: StoreSubscriber {
     }
   }
 
+  static var spatialAudioEnabled = Application.store.state.settings.spatialAudioEnabled
+  static var spatialAudioPreset = Application.store.state.settings.spatialAudioPreset
+
   static var updatesFeedUrl: URL? {
     return Application.store.state.settings.doBetaUpdates ? Constants.BETA_UPDATES_FEED : Constants.UPDATES_FEED
   }
@@ -73,6 +76,8 @@ class Settings: StoreSubscriber {
       Settings.iconMode = Application.store.state.settings.iconMode
       Settings.doAutoCheckUpdates = Application.store.state.settings.doAutoCheckUpdates
       Settings.doBetaUpdates = Application.store.state.settings.doBetaUpdates
+      Settings.spatialAudioEnabled = Application.store.state.settings.spatialAudioEnabled
+      Settings.spatialAudioPreset = Application.store.state.settings.spatialAudioPreset
     })()
   }
 
@@ -92,6 +97,16 @@ class Settings: StoreSubscriber {
     }
     if (state.doBetaUpdates != Settings.doBetaUpdates) {
       Settings.doBetaUpdates = state.doBetaUpdates
+    }
+    if (state.spatialAudioEnabled != Settings.spatialAudioEnabled) {
+      Settings.spatialAudioEnabled = state.spatialAudioEnabled
+      Console.log("Spatial Audio enabled: \(Settings.spatialAudioEnabled)")
+      Application.updateSpatialAudioState()
+    }
+    if (state.spatialAudioPreset != Settings.spatialAudioPreset) {
+      Settings.spatialAudioPreset = state.spatialAudioPreset
+      Console.log("Spatial Audio preset: \(Settings.spatialAudioPreset.rawValue)")
+      Application.updateSpatialAudioState()
     }
   }
 

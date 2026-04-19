@@ -1,0 +1,35 @@
+<div fxLayout="row" class="toolbar w-100" [style.min-height.px]="toolbarHeight" fxLayoutAlign="space-between center">
+  <div fxFlex="20" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
+    <eqm-toggle [enabled]="app.enabled" [state]="enabled" (stateChange)="setEnabled($event)"></eqm-toggle>
+    <eqm-icon
+      (click)="openSettings()"
+      eqmTooltip="Preset Guide"
+      eqmTooltipPositionSide="bottom"
+      name="cog"
+      color="#8E8E93"
+      [size]="16"
+    ></eqm-icon>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+    <eqm-label>Spatial Audio:</eqm-label>
+    <eqm-label class="summary" [class.disabled]="!enabled || !app.enabled">{{ summaryLabel }}</eqm-label>
+  </div>
+
+  <div fxFlex="10" fxLayout="row" fxLayoutAlign="end center">
+    <eqm-icon (click)="toggleVisibility()" [name]="show ? 'hide' : 'show'"></eqm-icon>
+  </div>
+</div>
+
+<div *ngIf="show" class="presets" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+  <eqm-dropdown
+    [enabled]="enabled && app.enabled"
+    [editable]="false"
+    [items]="presetOptions"
+    [selectedItem]="selectedPresetOption"
+    labelParam="label"
+    placeholder="Select Preset"
+    noItemsPlaceholder="No Presets"
+    (itemSelected)="selectPresetOption($event)"
+  ></eqm-dropdown>
+</div>

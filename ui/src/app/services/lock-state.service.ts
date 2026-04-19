@@ -28,9 +28,9 @@ export class LockStateService {
     }
   }
 
-  constructor(private readonly CONST: ConstantsService) {}
+  constructor (private readonly CONST: ConstantsService) {}
 
-  getDefinition(key: LockFeatureKey): LockStateDefinition {
+  getDefinition (key: LockFeatureKey): LockStateDefinition {
     return this.definitions[key]
   }
 }

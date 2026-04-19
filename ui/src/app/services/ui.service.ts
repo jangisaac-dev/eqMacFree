@@ -16,6 +16,7 @@ export interface UISettings {
   outputFeatureEnabled?: boolean
 
   showEqualizers?: boolean
+  showSpatialAudio?: boolean
 
   reverbsShownBefore?: boolean
 }
@@ -79,6 +80,9 @@ export class UIService extends DataService {
     }
     if (typeof uiSettings.outputFeatureEnabled !== 'boolean') {
       this.settings.outputFeatureEnabled = true
+    }
+    if (typeof uiSettings.showSpatialAudio !== 'boolean') {
+      this.settings.showSpatialAudio = true
     }
     this.setSettings(this.settings)
 

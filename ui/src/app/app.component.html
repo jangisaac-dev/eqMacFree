@@ -23,6 +23,9 @@
 
   <eqm-volume-booster-balance *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled" #volumeBoosterBalance></eqm-volume-booster-balance>
   <eqm-divider *ngIf="ui.settings.volumeFeatureEnabled || ui.settings.balanceFeatureEnabled"></eqm-divider>
+
+  <eqm-spatial-audio #spatialAudio></eqm-spatial-audio>
+  <eqm-divider></eqm-divider>
  
   <eqm-equalizers fxFlex *ngIf="ui.settings.equalizersFeatureEnabled" #equalizers></eqm-equalizers>
   <eqm-divider *ngIf="ui.settings.equalizersFeatureEnabled"></eqm-divider>
